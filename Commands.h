@@ -1,6 +1,7 @@
 #ifndef SMASH_COMMAND_H_
 #define SMASH_COMMAND_H_
 
+#include <string>
 #include <vector>
 
 #define COMMAND_ARGS_MAX_LENGTH (200)
@@ -9,19 +10,21 @@
 
 class Command {
 // TODO: Add your data members
+    char *argc[COMMAND_MAX_ARGS] = {};
+    int argv;
  public:
   Command(const char* cmd_line);
-  virtual ~Command();
+  virtual ~Command() {};
   virtual void execute() = 0;
   //virtual void prepare();
   //virtual void cleanup();
-  // TODO: Add your extra methods if needed
+  char* getArg(int i);
 };
 
 class BuiltInCommand : public Command {
  public:
   BuiltInCommand(const char* cmd_line);
-  virtual ~BuiltInCommand() {}
+  virtual ~BuiltInCommand();
 };
 
 class ExternalCommand : public Command {
@@ -54,6 +57,13 @@ class ChangeDirCommand : public BuiltInCommand {
   ChangeDirCommand(const char* cmd_line, char** plastPwd);
   virtual ~ChangeDirCommand() {}
   void execute() override;
+};
+
+class ChangePromptCommand : public BuiltInCommand {
+public:
+    ChangePromptCommand(const char* cmd_line);
+    virtual ~ChangePromptCommand() {}
+    void execute() override;
 };
 
 class GetCurrDirCommand : public BuiltInCommand {
@@ -165,7 +175,7 @@ class CopyCommand : public BuiltInCommand {
 
 class SmallShell {
  private:
-  // TODO: Add your data members
+  std::string prompt = "smash";
   SmallShell();
  public:
   Command *CreateCommand(const char* cmd_line);
@@ -177,6 +187,8 @@ class SmallShell {
     // Instantiated on first use.
     return instance;
   }
+  std::string getPrompt();
+  void setPrompt(const char* _prompt);
   ~SmallShell();
   void executeCommand(const char* cmd_line);
   // TODO: add extra methods as needed

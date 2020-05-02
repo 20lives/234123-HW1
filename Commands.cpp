@@ -92,29 +92,58 @@ SmallShell::~SmallShell() {
 // TODO: add your implementation
 }
 
+string SmallShell::getPrompt() {
+    return prompt;
+}
+
 /**
 * Creates and returns a pointer to Command class which matches the given command line (cmd_line)
 */
 Command * SmallShell::CreateCommand(const char* cmd_line) {
-	// For example:
-/*
   string cmd_s = string(cmd_line);
-  if (cmd_s.find("pwd") == 0) {
-    return new GetCurrDirCommand(cmd_line);
+  if (cmd_s.find("chprompt") == 0) {
+      return new ChangePromptCommand(cmd_line);
   }
-  else if ...
-  .....
-  else {
-    return new ExternalCommand(cmd_line);
-  }
-  */
   return nullptr;
+}
+
+Command::Command(const char* cmd_line) {
+    argv = _parseCommandLine(cmd_line, argc);
+}
+
+char* Command::getArg(int i) {
+    return argc[i];
+}
+
+
+BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command(cmd_line) {
+
+}
+
+BuiltInCommand::~BuiltInCommand() {
+
+}
+
+ChangePromptCommand::ChangePromptCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
+
+}
+
+void ChangePromptCommand::execute() {
+    SmallShell& smash = SmallShell::getInstance();
+    smash.setPrompt(getArg(1));
 }
 
 void SmallShell::executeCommand(const char *cmd_line) {
   // TODO: Add your implementation here
+
   // for example:
-  // Command* cmd = CreateCommand(cmd_line);
-  // cmd->execute();
+  Command* cmd = CreateCommand(cmd_line);
+  if (cmd) {
+    cmd->execute();
+  }
   // Please note that you must fork smash process for some commands (e.g., external commands....)
+}
+
+void SmallShell::setPrompt(const char *_prompt) {
+    prompt = _prompt;
 }
