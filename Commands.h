@@ -19,6 +19,7 @@ class Command {
   //virtual void prepare();
   //virtual void cleanup();
   char* getArg(int i);
+  int getArgCount();
 };
 
 class BuiltInCommand : public Command {
