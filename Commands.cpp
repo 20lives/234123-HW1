@@ -115,6 +115,9 @@ char* Command::getArg(int i) {
     return argc[i];
 }
 
+int Command::getArgCount() {
+    return argv;
+}
 
 BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command(cmd_line) {
 
@@ -130,7 +133,11 @@ ChangePromptCommand::ChangePromptCommand(const char* cmd_line) : BuiltInCommand(
 
 void ChangePromptCommand::execute() {
     SmallShell& smash = SmallShell::getInstance();
-    smash.setPrompt(getArg(1));
+    if (getArgCount() > 1) {
+        smash.setPrompt(getArg(1));
+    } else {
+        smash.setPrompt("smash");
+    }
 }
 
 void SmallShell::executeCommand(const char *cmd_line) {
