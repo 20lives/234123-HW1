@@ -81,6 +81,13 @@ class ShowPidCommand : public BuiltInCommand {
   void execute() override;
 };
 
+class PwdCommand : public BuiltInCommand {
+public:
+    PwdCommand(const char* cmd_line);
+    virtual ~PwdCommand() {}
+    void execute() override;
+};
+
 class JobsList;
 class QuitCommand : public BuiltInCommand {
 // TODO: Add your data members public:
