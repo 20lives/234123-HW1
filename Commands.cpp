@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 #include <iomanip>
 #include "Commands.h"
+#include <linux/limits.h>
 
 using namespace std;
 
@@ -105,6 +106,8 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       return new ChangePromptCommand(cmd_line);
   } else if (cmd_s.find("showpid") == 0) {
       return new ShowPidCommand(cmd_line);
+  } else if (cmd_s.find("pwd") == 0) {
+      return new PwdCommand(cmd_line);
   }
   return nullptr;
 }
@@ -138,7 +141,9 @@ ShowPidCommand::ShowPidCommand(const char* cmd_line) : BuiltInCommand(cmd_line) 
 
 }
 
+PwdCommand::PwdCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
 
+}
 
 void ChangePromptCommand::execute() {
     SmallShell& smash = SmallShell::getInstance();
@@ -151,6 +156,12 @@ void ChangePromptCommand::execute() {
 
 void ShowPidCommand::execute() {
     std::cout << "smash pid is " << getpid() << "\n";
+}
+
+void PwdCommand::execute() {
+    char currWorkingDir[PATH_MAX];
+    getcwd(currWorkingDir, PATH_MAX);
+    std::cout << currWorkingDir << "\n";
 }
 
 void SmallShell::executeCommand(const char *cmd_line) {
