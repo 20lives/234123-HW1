@@ -103,6 +103,8 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   string cmd_s = string(cmd_line);
   if (cmd_s.find("chprompt") == 0) {
       return new ChangePromptCommand(cmd_line);
+  } else if (cmd_s.find("showpid") == 0) {
+      return new ShowPidCommand(cmd_line);
   }
   return nullptr;
 }
@@ -131,6 +133,13 @@ ChangePromptCommand::ChangePromptCommand(const char* cmd_line) : BuiltInCommand(
 
 }
 
+
+ShowPidCommand::ShowPidCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
+
+}
+
+
+
 void ChangePromptCommand::execute() {
     SmallShell& smash = SmallShell::getInstance();
     if (getArgCount() > 1) {
@@ -138,6 +147,10 @@ void ChangePromptCommand::execute() {
     } else {
         smash.setPrompt("smash");
     }
+}
+
+void ShowPidCommand::execute() {
+    std::cout << "smash pid is " << getpid() << "\n";
 }
 
 void SmallShell::executeCommand(const char *cmd_line) {
