@@ -28,6 +28,18 @@ const std::string WHITESPACE = " \n\r\t\f\v";
 #define EXEC(path, arg) \
   execvp((path), (arg));
 
+// converts character array
+// to string and returns it
+string _convertToString(char* a, int size)
+{
+    int i;
+    string s = "";
+    for (i = 0; i < size; i++) {
+        s = s + a[i];
+    }
+    return s;
+}
+
 string _ltrim(const std::string& s)
 {
   size_t start = s.find_first_not_of(WHITESPACE);
@@ -108,6 +120,8 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       return new ShowPidCommand(cmd_line);
   } else if (cmd_s.find("pwd") == 0) {
       return new PwdCommand(cmd_line);
+  } else if (cmd_s.find("cd") == 0) {
+      return new CdCommand(cmd_line);
   }
   return nullptr;
 }
@@ -145,6 +159,10 @@ PwdCommand::PwdCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
 
 }
 
+CdCommand::CdCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
+
+}
+
 void ChangePromptCommand::execute() {
     SmallShell& smash = SmallShell::getInstance();
     if (getArgCount() > 1) {
@@ -164,6 +182,40 @@ void PwdCommand::execute() {
     std::cout << currWorkingDir << "\n";
 }
 
+enum CD_TYPE {
+    ePrevDir, eParentDir
+};
+
+void  _changeDirectory(CD_TYPE cdType, char* dir = nullptr) {
+    SmallShell& smash = SmallShell::getInstance();
+    char currWorkingDir[PATH_MAX] = {};
+    getcwd(currWorkingDir, PATH_MAX);
+    string sCurrentWorkingDir = _convertToString(currWorkingDir, PATH_MAX);
+    if (cdType == ePrevDir) {
+        if (!smash.isPrevDirSet) {
+            std::cout << "smash error: cd: OLDPWD not set" << "\n";
+            return;
+        }
+        chdir(smash.getPrevDir().c_str());
+    } else {
+        chdir(dir);
+    }
+    smash.setPrevDir(currWorkingDir);
+    smash.isPrevDirSet = true;
+}
+
+void CdCommand::execute() {
+    if (getArgCount() > 2) {
+        std::cout << "smash error: cd: too many arguments" << "\n";
+    } else if (getArgCount() == 2) {
+        if (strcmp(getArg(1), "-") == 0) {
+            _changeDirectory(ePrevDir);
+        } else if (strcmp(getArg(1), "..") == 0) {
+            _changeDirectory(eParentDir, getArg(1));
+        }
+    }
+}
+
 void SmallShell::executeCommand(const char *cmd_line) {
   // TODO: Add your implementation here
 
@@ -173,8 +225,16 @@ void SmallShell::executeCommand(const char *cmd_line) {
     cmd->execute();
   }
   // Please note that you must fork smash process for some commands (e.g., external commands....)
-}
+};
 
 void SmallShell::setPrompt(const char *_prompt) {
     prompt = _prompt;
+}
+
+void SmallShell::setPrevDir(const char* _dir) {
+    prevDir = _dir;
+}
+
+string SmallShell::getPrevDir() {
+    return prevDir;
 }
