@@ -88,6 +88,13 @@ public:
     void execute() override;
 };
 
+class CdCommand : public BuiltInCommand {
+public:
+    CdCommand(const char* cmd_line);
+    virtual ~CdCommand() {}
+    void execute() override;
+};
+
 class JobsList;
 class QuitCommand : public BuiltInCommand {
 // TODO: Add your data members public:
@@ -183,10 +190,12 @@ class CopyCommand : public BuiltInCommand {
 
 class SmallShell {
  private:
+    std::string prevDir = "";
   std::string prompt = "smash";
   SmallShell();
  public:
-  Command *CreateCommand(const char* cmd_line);
+    bool isPrevDirSet = false;
+    Command *CreateCommand(const char* cmd_line);
   SmallShell(SmallShell const&)      = delete; // disable copy ctor
   void operator=(SmallShell const&)  = delete; // disable = operator
   static SmallShell& getInstance() // make SmallShell singleton
@@ -197,6 +206,8 @@ class SmallShell {
   }
   std::string getPrompt();
   void setPrompt(const char* _prompt);
+  std::string getPrevDir();
+  void setPrevDir(const char* _dir);
   ~SmallShell();
   void executeCommand(const char* cmd_line);
   // TODO: add extra methods as needed
