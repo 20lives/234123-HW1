@@ -96,7 +96,7 @@ void _removeBackgroundSign(char* cmd_line) {
     // replace the & (background sign) with space and then remove all tailing spaces.
     cmd_line[idx] = ' ';
     // truncate the command line string up to the last non-space character
-    cmd_line[str.find_last_not_of(WHITESPACE, idx) + 1] = 0;
+    cmd_line[str.find_last_not_of(WHITESPACE, idx)] = 0;
 }
 
 SmallShell::SmallShell() {
@@ -166,8 +166,11 @@ CdCommand::CdCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
 
 void ChangePromptCommand::execute() {
     SmallShell& smash = SmallShell::getInstance();
+    char prompt[COMMAND_ARGS_MAX_LENGTH] = {};
     if (getArgCount() > 1) {
-        smash.setPrompt(getArg(1));
+        strcpy(prompt, getArg(1));
+        _removeBackgroundSign(prompt);
+        smash.setPrompt(prompt);
     } else {
         smash.setPrompt("smash");
     }
@@ -188,8 +191,6 @@ void  _changeDirectory(CD_TYPE cdType, char* dir = nullptr) {
     char currWorkingDir[COMMAND_ARGS_MAX_LENGTH] = {};
     char newWorkingDir[COMMAND_ARGS_MAX_LENGTH] = {};
     getcwd(currWorkingDir, COMMAND_ARGS_MAX_LENGTH);
-    string sCurrentWorkingDir = _convertToString(currWorkingDir, COMMAND_ARGS_MAX_LENGTH);
-
     if (cdType == ePrevDir) {
         if (!smash.isPrevDirSet) {
             std::cout << "smash error: cd: OLDPWD not set" << "\n";
