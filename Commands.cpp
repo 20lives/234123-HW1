@@ -210,7 +210,7 @@ void CdCommand::execute() {
     } else if (getArgCount() == 2) {
         if (strcmp(getArg(1), "-") == 0) {
             _changeDirectory(ePrevDir);
-        } else if (strcmp(getArg(1), "..") == 0) {
+        } else {
             _changeDirectory(eParentDir, getArg(1));
         }
     }
