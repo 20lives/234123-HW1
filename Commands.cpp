@@ -6,7 +6,7 @@
 #include <sys/wait.h>
 #include <iomanip>
 #include "Commands.h"
-#include <linux/limits.h>
+#include <errno.h>
 
 using namespace std;
 
@@ -32,6 +32,10 @@ const std::string WHITESPACE = " \n\r\t\f\v";
 enum CD_TYPE {
     ePrevDir, eChangeDir
 };
+
+//enum SYS_CALL_TYPE {
+//    eGetPid, eGetCwd, eChdir
+//};
 
 // converts character array
 // to string and returns it
@@ -174,24 +178,30 @@ void ShowPidCommand::execute() {
 }
 
 void PwdCommand::execute() {
-    char currWorkingDir[PATH_MAX];
-    getcwd(currWorkingDir, PATH_MAX);
+    char currWorkingDir[COMMAND_ARGS_MAX_LENGTH];
+    getcwd(currWorkingDir, COMMAND_ARGS_MAX_LENGTH);
     std::cout << currWorkingDir << "\n";
 }
 
 void  _changeDirectory(CD_TYPE cdType, char* dir = nullptr) {
     SmallShell& smash = SmallShell::getInstance();
-    char currWorkingDir[PATH_MAX] = {};
-    getcwd(currWorkingDir, PATH_MAX);
-    string sCurrentWorkingDir = _convertToString(currWorkingDir, PATH_MAX);
+    char currWorkingDir[COMMAND_ARGS_MAX_LENGTH] = {};
+    char newWorkingDir[COMMAND_ARGS_MAX_LENGTH] = {};
+    getcwd(currWorkingDir, COMMAND_ARGS_MAX_LENGTH);
+    string sCurrentWorkingDir = _convertToString(currWorkingDir, COMMAND_ARGS_MAX_LENGTH);
+
     if (cdType == ePrevDir) {
         if (!smash.isPrevDirSet) {
             std::cout << "smash error: cd: OLDPWD not set" << "\n";
             return;
         }
-        chdir(smash.getPrevDir().c_str());
+        strcpy(newWorkingDir, smash.getPrevDir().c_str());
     } else {
-        chdir(dir);
+        strcpy(newWorkingDir, dir);
+    }
+    if (chdir(newWorkingDir) == -1) {
+        //chdir failed
+        perror("smash error: cd failed");
     }
     smash.setPrevDir(currWorkingDir);
     smash.isPrevDirSet = true;
