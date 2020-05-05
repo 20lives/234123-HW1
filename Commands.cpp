@@ -152,7 +152,7 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
     // set cmd type
     _setCmdType(argv[0], &eCmdType);
 
-    _freeFields(argv, argc);
+    //_freeFields(argv, argc);
 
     if (eCmdType == eChprompt) {
         return new ChangePromptCommand(cmd_line);
@@ -179,7 +179,7 @@ int Command::getArgCount() {
 }
 
 Command::~Command() {
-    _freeFields(argv, argc);
+    //_freeFields(argv, argc);
 }
 
 BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command(cmd_line) {
@@ -212,10 +212,12 @@ void ChangePromptCommand::execute() {
     if (getArgCount() > 1) {
         strcpy(prompt, getArg(1));
         _removeBackgroundSign(prompt);
-        smash.setPrompt(prompt);
-    } else {
-        smash.setPrompt("smash");
+         if (strcmp(prompt, "") != 0) {
+             smash.setPrompt(prompt);
+             return;
+         }
     }
+    smash.setPrompt("smash");
 }
 
 void ShowPidCommand::execute() {
