@@ -76,6 +76,13 @@ int _parseCommandLine(const char* cmd_line, char** args) {
     FUNC_EXIT()
 }
 
+void _freeFields(char ** argv, int argc)
+{
+    for(int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
 bool _isBackgroundComamnd(const char* cmd_line) {
     const string str(cmd_line);
     return str[str.find_last_not_of(WHITESPACE)] == '&';
@@ -111,33 +118,68 @@ string SmallShell::getPrompt() {
     return prompt;
 }
 
+enum CMD_TYPE {
+    eChprompt, eShowpid, ePwd, eCd, eExternal
+};
+
+void _setCmdType(char *cmd, CMD_TYPE *eCmdType) {
+    if (strcmp(cmd, "chprompt") == 0) {
+        *eCmdType = eChprompt;
+    } else if (strcmp(cmd, "showpid") == 0) {
+        *eCmdType = eShowpid;
+    } else if (strcmp(cmd, "pwd") == 0) {
+        *eCmdType = ePwd;
+    } else if (strcmp(cmd, "cd") == 0) {
+        *eCmdType = eCd;
+    } else {
+        *eCmdType = eExternal;
+    }
+}
+
 /**
 * Creates and returns a pointer to Command class which matches the given command line (cmd_line)
 */
 Command *SmallShell::CreateCommand(const char* cmd_line) {
-    string cmd_s = string(cmd_line);
-    if (cmd_s.find("chprompt") == 0) {
+    char *argv[COMMAND_MAX_ARGS] = {};
+    int argc = _parseCommandLine(cmd_line, argv);
+    bool isBackgroundCmd;
+    CMD_TYPE eCmdType;
+
+    // check if the command is background command and remove the & from the command
+    string lastWord = argv[argc - 1];
+    isBackgroundCmd = (lastWord.back() == '&');
+    _removeBackgroundSign(argv[argc - 1]);
+    // set cmd type
+    _setCmdType(argv[0], &eCmdType);
+
+    _freeFields(argv, argc);
+
+    if (eCmdType == eChprompt) {
         return new ChangePromptCommand(cmd_line);
-    } else if (cmd_s.find("showpid") == 0) {
+    } else if (eCmdType == eShowpid) {
         return new ShowPidCommand(cmd_line);
-    } else if (cmd_s.find("pwd") == 0) {
+    } else if (eCmdType == ePwd) {
         return new PwdCommand(cmd_line);
-    } else if (cmd_s.find("cd") == 0) {
+    } else if (eCmdType == eCd) {
         return new CdCommand(cmd_line);
     }
     return nullptr;
 }
 
 Command::Command(const char* cmd_line) {
-    argv = _parseCommandLine(cmd_line, argc);
+    argc = _parseCommandLine(cmd_line, argv);
 }
 
 char* Command::getArg(int i) {
-    return argc[i];
+    return argv[i];
 }
 
 int Command::getArgCount() {
-    return argv;
+    return argc;
+}
+
+Command::~Command() {
+    _freeFields(argv, argc);
 }
 
 BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command(cmd_line) {

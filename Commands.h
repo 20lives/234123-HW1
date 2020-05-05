@@ -10,11 +10,11 @@
 
 class Command {
 private:
-    char *argc[COMMAND_MAX_ARGS] = {};
-    int argv;
+    char *argv[COMMAND_MAX_ARGS] = {};
+    int argc;
 public:
     Command(const char* cmd_line);
-    virtual ~Command() {};
+    virtual ~Command();
     virtual void execute() = 0;
     //virtual void prepare();
     //virtual void cleanup();
