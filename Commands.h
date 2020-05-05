@@ -9,9 +9,6 @@
 #define HISTORY_MAX_RECORDS (50)
 
 class Command {
-protected:
-    char *argv[COMMAND_MAX_ARGS] = {};
-    int argc;
 public:
     Command(const char* cmd_line);
     virtual ~Command();
@@ -23,12 +20,22 @@ public:
 };
 
 class BuiltInCommand : public Command {
+protected:
+    char *argv[COMMAND_MAX_ARGS] = {};
+    int argc;
 public:
     BuiltInCommand(const char* cmd_line);
     virtual ~BuiltInCommand();
+
+    char *getArg(int i);
+
+    int getArgCount();
 };
 
 class ExternalCommand : public Command {
+protected:
+    char cmdLine[COMMAND_ARGS_MAX_LENGTH] = {};
+    int cmdLineLength = 0;
 public:
     bool isBackgroundCmd;
     ExternalCommand(const char* cmd_line, bool isBackgroundCmd);

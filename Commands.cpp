@@ -147,7 +147,6 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
         _freeFields(argv, argc);
         return nullptr;
     }
-
     char cmdLine[COMMAND_ARGS_MAX_LENGTH];
     strcpy(cmdLine, cmd_line);
     bool isBackgroundCmd;
@@ -179,27 +178,27 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
 }
 
 Command::Command(const char* cmd_line) {
-    argc = _parseCommandLine(cmd_line, argv);
+    //argc = _parseCommandLine(cmd_line, argv);
 }
 
-char* Command::getArg(int i) {
+char* BuiltInCommand::getArg(int i) {
     return argv[i];
 }
 
-int Command::getArgCount() {
+int BuiltInCommand::getArgCount() {
     return argc;
 }
 
 Command::~Command() {
-    _freeFields(argv, argc);
+
 }
 
 BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command(cmd_line) {
-
+    argc = _parseCommandLine(cmd_line, argv);
 }
 
 BuiltInCommand::~BuiltInCommand() {
-
+    _freeFields(argv, argc);
 }
 
 ChangePromptCommand::ChangePromptCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
@@ -219,21 +218,20 @@ CdCommand::CdCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
 }
 
 ExternalCommand::ExternalCommand(const char* cmd_line, bool _isBackgroundCmd) : isBackgroundCmd(_isBackgroundCmd), Command(cmd_line) {
-
+    strcpy(cmdLine, cmd_line);
+    cmdLineLength = string(cmd_line).length();
 }
 
 void ExternalCommand::execute() {
     // update args array
-    char *args[COMMAND_MAX_ARGS + 3] = {};
-    args[0] = (char*)malloc(string("-c").length() + 1);
+    char *args[4] = {};
+    args[0] = (char*)malloc(string("/bin/bash").length() + 1);
     strcpy(args[0], "/bin/bash");
     args[1] = (char*)malloc(string("-c").length() + 1);
     strcpy(args[1], "-c");
-    for (int i = 0; i < argc; i++) {
-        args[i + 2] = (char*)malloc(string(argv[i]).length() + 1);
-        strcpy(args[i + 2], argv[i]);
-    }
-    args[argc + 2] = NULL;
+    args[2] = (char*)malloc(cmdLineLength + 1);
+    strcpy(args[2], (string(cmdLine)).c_str());
+    args[3] = NULL;
 
     pid_t pid = fork();
     if (pid == 0) {
