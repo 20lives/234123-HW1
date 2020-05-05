@@ -80,7 +80,7 @@ void _freeFields(char ** argv, int argc)
 {
     for(int i = 0; i < argc; i++)
         free(argv[i]);
-    free(argv);
+    //free(argv);
 }
 
 bool _isBackgroundComamnd(const char* cmd_line) {
@@ -142,26 +142,35 @@ void _setCmdType(char *cmd, CMD_TYPE *eCmdType) {
 Command *SmallShell::CreateCommand(const char* cmd_line) {
     char *argv[COMMAND_MAX_ARGS] = {};
     int argc = _parseCommandLine(cmd_line, argv);
+
+    if (argc == 0) {
+        _freeFields(argv, argc);
+        return nullptr;
+    }
+
+    char cmdLine[COMMAND_ARGS_MAX_LENGTH];
+    strcpy(cmdLine, cmd_line);
     bool isBackgroundCmd;
     CMD_TYPE eCmdType;
 
-    // check if the command is background command and remove the & from the command
-    string lastWord = argv[argc - 1];
-    isBackgroundCmd = (lastWord.back() == '&');
-    _removeBackgroundSign(argv[argc - 1]);
-    // set cmd type
+    // 1. check if &
+    isBackgroundCmd = (string(cmd_line).back() == '&');
+    // 2. remove last &
+    _removeBackgroundSign(cmdLine);
+    // now we have the cmd line with out the last & and we have a boolean value indicating if this is a background cmd
+    // 3. set cmd type
     _setCmdType(argv[0], &eCmdType);
-
-    //_freeFields(argv, argc);
-
+    // 4. free the cmdLine
+    _freeFields(argv, argc);
+    // 5. create te command
     if (eCmdType == eChprompt) {
-        return new ChangePromptCommand(cmd_line);
+        return new ChangePromptCommand(cmdLine);
     } else if (eCmdType == eShowpid) {
-        return new ShowPidCommand(cmd_line);
+        return new ShowPidCommand(cmdLine);
     } else if (eCmdType == ePwd) {
-        return new PwdCommand(cmd_line);
+        return new PwdCommand(cmdLine);
     } else if (eCmdType == eCd) {
-        return new CdCommand(cmd_line);
+        return new CdCommand(cmdLine);
     }
     return nullptr;
 }
@@ -179,7 +188,7 @@ int Command::getArgCount() {
 }
 
 Command::~Command() {
-    //_freeFields(argv, argc);
+    _freeFields(argv, argc);
 }
 
 BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command(cmd_line) {
@@ -211,13 +220,10 @@ void ChangePromptCommand::execute() {
     char prompt[COMMAND_ARGS_MAX_LENGTH] = {};
     if (getArgCount() > 1) {
         strcpy(prompt, getArg(1));
-        _removeBackgroundSign(prompt);
-         if (strcmp(prompt, "") != 0) {
-             smash.setPrompt(prompt);
-             return;
-         }
+        smash.setPrompt(prompt);
+    } else {
+        smash.setPrompt("smash");
     }
-    smash.setPrompt("smash");
 }
 
 void ShowPidCommand::execute() {
@@ -275,6 +281,7 @@ void SmallShell::executeCommand(const char *cmd_line) {
     if (cmd) {
         cmd->execute();
     }
+    delete(cmd);
 // Please note that you must fork smash process for some commands (e.g., external commands....)
 };
 
