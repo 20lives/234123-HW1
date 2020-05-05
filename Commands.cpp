@@ -240,7 +240,10 @@ void ExternalCommand::execute() {
         execv("/bin/bash", args);
     } else {
         // parent pid
-        wait(NULL);
+        if (!isBackgroundCmd){
+            // in case this is not a background cmd we will wait for the child process to finish
+            wait(NULL);
+        }
     }
 }
 
