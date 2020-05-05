@@ -171,6 +171,9 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
         return new PwdCommand(cmdLine);
     } else if (eCmdType == eCd) {
         return new CdCommand(cmdLine);
+    } else {
+        // external cmd is the last possibly
+        return new ExternalCommand(cmdLine, isBackgroundCmd);
     }
     return nullptr;
 }
@@ -213,6 +216,32 @@ PwdCommand::PwdCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
 
 CdCommand::CdCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
 
+}
+
+ExternalCommand::ExternalCommand(const char* cmd_line, bool _isBackgroundCmd) : isBackgroundCmd(_isBackgroundCmd), Command(cmd_line) {
+
+}
+
+void ExternalCommand::execute() {
+    // update args array
+    char *args[COMMAND_MAX_ARGS + 3] = {};
+    args[0] = (char*)malloc(string("-c").length() + 1);
+    strcpy(args[0], "/bin/bash");
+    args[1] = (char*)malloc(string("-c").length() + 1);
+    strcpy(args[1], "-c");
+    for (int i = 0; i < argc; i++) {
+        args[i + 2] = (char*)malloc(string(argv[i]).length() + 1);
+        strcpy(args[i + 2], argv[i]);
+    }
+    args[argc + 2] = NULL;
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        execv("/bin/bash", args);
+    } else {
+        // parent pid
+        wait(NULL);
+    }
 }
 
 void ChangePromptCommand::execute() {

@@ -9,7 +9,7 @@
 #define HISTORY_MAX_RECORDS (50)
 
 class Command {
-private:
+protected:
     char *argv[COMMAND_MAX_ARGS] = {};
     int argc;
 public:
@@ -30,7 +30,8 @@ public:
 
 class ExternalCommand : public Command {
 public:
-    ExternalCommand(const char* cmd_line);
+    bool isBackgroundCmd;
+    ExternalCommand(const char* cmd_line, bool isBackgroundCmd);
     virtual ~ExternalCommand() {}
     void execute() override;
 };
