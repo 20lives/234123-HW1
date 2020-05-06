@@ -2,11 +2,12 @@
 #define SMASH_COMMAND_H_
 
 #include <string>
+#include <time.h>
+#include <list>
 #include <vector>
 
-#define COMMAND_ARGS_MAX_LENGTH (200)
-#define COMMAND_MAX_ARGS (20)
-#define HISTORY_MAX_RECORDS (50)
+#include "signals.h"
+#include "SmallShell.h"
 
 class Command {
 public:
@@ -15,32 +16,6 @@ public:
     virtual void execute() = 0;
     //virtual void prepare();
     //virtual void cleanup();
-    char* getArg(int i);
-    int getArgCount();
-};
-
-class BuiltInCommand : public Command {
-protected:
-    char *argv[COMMAND_MAX_ARGS] = {};
-    int argc;
-public:
-    BuiltInCommand(const char* cmd_line);
-    virtual ~BuiltInCommand();
-
-    char *getArg(int i);
-
-    int getArgCount();
-};
-
-class ExternalCommand : public Command {
-protected:
-    char cmdLine[COMMAND_ARGS_MAX_LENGTH] = {};
-    int cmdLineLength = 0;
-public:
-    bool isBackgroundCmd;
-    ExternalCommand(const char* cmd_line, bool isBackgroundCmd);
-    virtual ~ExternalCommand() {}
-    void execute() override;
 };
 
 class PipeCommand : public Command {
@@ -61,42 +36,6 @@ public:
     //void cleanup() override;
 };
 
-class ChangePromptCommand : public BuiltInCommand {
-    public:
-    ChangePromptCommand(const char* cmd_line);
-    virtual ~ChangePromptCommand() {}
-    void execute() override;
-};
-
-class ShowPidCommand : public BuiltInCommand {
-public:
-    ShowPidCommand(const char* cmd_line);
-    virtual ~ShowPidCommand() {}
-    void execute() override;
-};
-
-class PwdCommand : public BuiltInCommand {
-public:
-    PwdCommand(const char* cmd_line);
-    virtual ~PwdCommand() {}
-    void execute() override;
-};
-
-class CdCommand : public BuiltInCommand {
-public:
-    CdCommand(const char* cmd_line);
-    virtual ~CdCommand() {}
-    void execute() override;
-};
-
-class JobsList;
-class QuitCommand : public BuiltInCommand {
-    // TODO: Add your data members public:
-    QuitCommand(const char* cmd_line, JobsList* jobs);
-    virtual ~QuitCommand() {}
-    void execute() override;
-};
-
 class CommandsHistory {
 protected:
     class CommandHistoryEntry {
@@ -108,102 +47,6 @@ public:
     ~CommandsHistory() {}
     void addRecord(const char* cmd_line);
     void printHistory();
-};
-
-class HistoryCommand : public BuiltInCommand {
-// TODO: Add your data members
-public:
-    HistoryCommand(const char* cmd_line, CommandsHistory* history);
-    virtual ~HistoryCommand() {}
-    void execute() override;
-};
-
-class JobsList {
-public:
-    class JobEntry {
-        // TODO: Add your data members
-    };
-    // TODO: Add your data members
-public:
-    JobsList();
-    ~JobsList();
-    void addJob(Command* cmd, bool isStopped = false);
-    void printJobsList();
-    void killAllJobs();
-    void removeFinishedJobs();
-    JobEntry * getJobById(int jobId);
-    void removeJobById(int jobId);
-    JobEntry * getLastJob(int* lastJobId);
-    JobEntry *getLastStoppedJob(int *jobId);
-    // TODO: Add extra methods or modify exisitng ones as needed
-};
-
-class JobsCommand : public BuiltInCommand {
-// TODO: Add your data members
-public:
-    JobsCommand(const char* cmd_line, JobsList* jobs);
-    virtual ~JobsCommand() {}
-    void execute() override;
-};
-
-class KillCommand : public BuiltInCommand {
-    // TODO: Add your data members
-public:
-    KillCommand(const char* cmd_line, JobsList* jobs);
-    virtual ~KillCommand() {}
-    void execute() override;
-};
-
-class ForegroundCommand : public BuiltInCommand {
-// TODO: Add your data members
-public:
-    ForegroundCommand(const char* cmd_line, JobsList* jobs);
-    virtual ~ForegroundCommand() {}
-    void execute() override;
-};
-
-class BackgroundCommand : public BuiltInCommand {
-// TODO: Add your data members
-public:
-    BackgroundCommand(const char* cmd_line, JobsList* jobs);
-    virtual ~BackgroundCommand() {}
-    void execute() override;
-};
-
-
-// TODO: should it really inhirit from BuiltInCommand ?
-class CopyCommand : public BuiltInCommand {
-public:
-    CopyCommand(const char* cmd_line);
-    virtual ~CopyCommand() {}
-    void execute() override;
-};
-
-// TODO: add more classes if needed 
-// maybe chprompt , timeout ?
-
-class SmallShell {
-private:
-    std::string prevDir = "";
-    std::string prompt = "smash";
-    SmallShell();
-public:
-    bool isPrevDirSet = false;
-    Command *CreateCommand(const char* cmd_line);
-    SmallShell(SmallShell const&)      = delete; // disable copy ctor
-    void operator=(SmallShell const&)  = delete; // disable = operator
-    static SmallShell& getInstance() {
-    static SmallShell instance; // Guaranteed to be destroyed.
-    // Instantiated on first use.
-    return instance;
-    }
-    void executeCommand(const char* cmd_line);
-    std::string getPrompt();
-    void setPrompt(const char* _prompt);
-    std::string getPrevDir();
-    void setPrevDir(const char* _dir);
-    ~SmallShell();
-    // TODO: add extra methods as needed
 };
 
 #endif //SMASH_COMMAND_H_

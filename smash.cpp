@@ -2,17 +2,20 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include "Commands.h"
+
 #include "signals.h"
+#include "SmallShell.h"
 
 int main(int argc, char* argv[]) {
-    if(signal(SIGTSTP , ctrlZHandler)==SIG_ERR) {
+    if(signal(SIGTSTP , ctrlZHandler) == SIG_ERR) {
         perror("smash error: failed to set ctrl-Z handler");
     }
-    if(signal(SIGINT , ctrlCHandler)==SIG_ERR) {
+    if(signal(SIGINT , ctrlCHandler) == SIG_ERR) {
         perror("smash error: failed to set ctrl-C handler");
     }
-
+    if(signal(SIGALRM , ctrlCHandler) == SIG_ERR) {
+        perror("smash error: failed to set alarm handler");
+    }
     //TODO: setup sig alarm handler
 
     SmallShell& smash = SmallShell::getInstance();

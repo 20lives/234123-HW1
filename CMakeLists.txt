@@ -3,4 +3,4 @@ project(hw1_234123)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(hw1_234123 smash.cpp Commands.cpp Commands.h signals.cpp signals.h)
+add_executable(hw1_234123 smash.cpp Commands.cpp signals.cpp BuiltInCommand.cpp Utilities.cpp ExternalCommand.cpp SmallShell.cpp JobsList.cpp)
