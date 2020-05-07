@@ -87,7 +87,7 @@ public:
 class BackgroundCommand : public BuiltInCommand {
 // TODO: Add your data members
 public:
-    BackgroundCommand(const char* cmd_line, JobsList* jobs);
+    BackgroundCommand(const char* cmd_line/*, JobsList* jobs*/);
     virtual ~BackgroundCommand() {}
     void execute() override;
 };

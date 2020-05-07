@@ -108,6 +108,10 @@ ForegroundCommand::ForegroundCommand(const char *cmd_line) : BuiltInCommand(cmd_
 
 }
 
+BackgroundCommand::BackgroundCommand(const char *cmd_line) : BuiltInCommand(cmd_line){
+
+}
+
 BuiltInCommand::~BuiltInCommand() {
     _freeFields(argv, argc);
 }
@@ -177,16 +181,39 @@ void ForegroundCommand::execute() {
             return;
         }
         // jobs list is not empty
-
     } else {
         // fg <job-id>
-        char* jobId = (char*)malloc((string(argv[1])).length() + 1);
-        strcpy(jobId, argv[1]);
-        if (!jobsList.isIn(_strToInt(jobId))) {
+        int jobId = _strToInt(argv[1]);
+        if (!jobsList.isIn(jobId)) {
             std::cerr << "smash error: fg: job-id " << jobId << " does not exist" << "\n";
         }
         // the jobId exists in jobs list
     }
+}
+
+void BackgroundCommand::execute() {
+    if (argc > 2 || argv[1] && !_isInteger(argv[1])) {
+        std::cerr << "smash error: Bg: invalid arguments" << "\n";
+        return;
+    }
+    JobsList& jobsList = JobsList::getInstance();
+    if (argc == 1) {
+        // bg
+        // If bg was typed with no arguments (without job-id) but jobs list does not contain any
+        // stopped job to resume in the background then the following error message should be
+        // reported:
+        // smash error: bg: there is no stopped jobs to resume
+    } else {
+        // bg <job-id>
+        int jobId = _strToInt(argv[1]);
+        if (!jobsList.isIn(_strToInt(argv[1]))) {
+            std::cerr << "smash error: bg job-id " << jobId << " does not exist" << "\n";
+        }
+    }
+    // If job-id exists but it is for a job which is already running in the background (not stopped)
+    // then the following error message should be reported:
+    // smash error: bg: job-id <job-id> is already running in the background
+
 }
 
 /**
