@@ -32,7 +32,7 @@ using namespace std;
 const std::string WHITESPACE = " \n\r\t\f\v";
 
 enum CMD_TYPE {
-    eChprompt, eShowpid, ePwd, eCd, eExternal
+    eChprompt, eShowpid, ePwd, eCd, eKill, eExternal
 };
 
 string _ltrim(const std::string& s);

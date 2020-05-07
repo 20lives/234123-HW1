@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <vector>
-#include <sys/wait.h>
 
 #include "SmallShell.h"
 #include "Utilities.h"
@@ -24,6 +23,8 @@ void _setCmdType(char *cmd, CMD_TYPE *eCmdType) {
         *eCmdType = ePwd;
     } else if (strcmp(cmd, "cd") == 0) {
         *eCmdType = eCd;
+    } else if ((strcmp(cmd, "kill") == 0)){
+        *eCmdType = eKill;
     } else {
         *eCmdType = eExternal;
     }
@@ -96,6 +97,8 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
         return new PwdCommand(cmdLine);
     } else if (eCmdType == eCd) {
         return new CdCommand(cmdLine);
+    } else if (eCmdType == eKill) {
+        return new KillCommand(cmdLine);
     } else {
         // external cmd is the last possibly
         return new ExternalCommand(cmdLine, isBackgroundCmd);

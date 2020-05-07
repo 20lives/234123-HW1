@@ -5,14 +5,11 @@
 #include <unistd.h>
 #include <string.h>
 #include <iostream>
-#include <vector>
-#include <sstream>
-#include <sys/wait.h>
-#include <iomanip>
-#include <errno.h>
+#include <signal.h>
 
 #include "BuiltInCommand.h"
 #include "Commands.h"
+#include "JobsList.h"
 #include "Utilities.h"
 
 using namespace std;
@@ -31,7 +28,7 @@ void  _changeDirectory(CD_TYPE cdType, char* dir = nullptr) {
     getcwd(currWorkingDir, COMMAND_ARGS_MAX_LENGTH);
     if (cdType == ePrevDir) {
         if (!smash.isPrevDirSet) {
-            std::cout << "smash error: cd: OLDPWD not set" << "\n";
+            std::cerr << "smash error: cd: OLDPWD not set" << "\n";
             return;
         }
         strcpy(newWorkingDir, smash.getPrevDir().c_str());
@@ -69,6 +66,10 @@ CdCommand::CdCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
 
 }
 
+KillCommand::KillCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
+
+}
+
 BuiltInCommand::~BuiltInCommand() {
     _freeFields(argv, argc);
 }
@@ -99,7 +100,7 @@ void PwdCommand::execute() {
 
 void CdCommand::execute() {
     if (getArgCount() > 2) {
-        std::cout << "smash error: cd: too many arguments" << "\n";
+        std::cerr << "smash error: cd: too many arguments" << "\n";
     } else if (getArgCount() == 2) {
         if (strcmp(getArg(1), "-") == 0) {
             _changeDirectory(ePrevDir);
@@ -107,6 +108,56 @@ void CdCommand::execute() {
             _changeDirectory(eChangeDir, getArg(1));
         }
     }
+}
+
+int _strToInt(char *arg) {
+    return atoi(arg);
+}
+
+bool _isInteger(char *arg) {
+    string s = string(arg);
+    if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
+    char * p;
+    strtol(s.c_str(), &p, 10);
+    return (*p == 0);
+}
+
+void _handleArgsForKillCmd(char **argv, int argc) {
+    // the kill cmd should be as following: kill -<num> <num>
+    bool isValidArgs = true;
+    if (argc != 3) {
+        isValidArgs = false;
+    }
+    if ((string(argv[1]).length() <= 1)) {
+        isValidArgs = false;
+    }
+    if (argv[1][0] != '-') {
+        isValidArgs = false;
+    }
+    // erase the '-' char
+    memmove(argv[1], string(argv[1]).erase(0,1).c_str(),sizeof(argv[1] - 1));
+    if (!_isInteger(argv[1]) || !_isInteger(argv[2])) {
+        isValidArgs = false;
+    }
+    if (!isValidArgs) {
+        std::cerr << "smash error: kill: invalid arguments" << "\n";
+    }
+}
+
+void KillCommand::execute() {
+    _handleArgsForKillCmd(argv, argc);
+    JobsList& jobsList = JobsList::getInstance();
+    int sig = _strToInt(argv[2]);
+    int jobId = _strToInt(argv[2]);
+    pid_t jobPid = jobsList.getJobPid(jobId);
+    // assuming getJobById is returning NULL if there is no job associated with the same id
+    if (jobPid == -1) {
+        std::cerr << "smash error: kill: job-id " << jobId << " does not exist" << "\n";
+        return;
+    }
+    // send signal to process
+
+    kill(jobPid, sig);
 }
 
 /**

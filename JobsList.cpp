@@ -50,3 +50,8 @@ int JobsList::getNextJobID() {
     }
     return maxId + 1;
 }
+
+pid_t JobsList::getJobPid(int jobId) {
+    // find pid with given jobId
+    return 0;
+}

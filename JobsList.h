@@ -20,6 +20,7 @@ private:
         bool isStopped;
         int jobId;
         time_t time;
+        pid_t jobPid;
     public:
         JobEntry(Command* _cmd, bool _isStopped, int _jobId);
         int getJobId();
@@ -43,6 +44,7 @@ public:
     void removeJobById(int jobId);
     JobEntry * getLastJob(int* lastJobId);
     JobEntry *getLastStoppedJob(int *jobId);
+    pid_t getJobPid(int jobId);
     // TODO: Add extra methods or modify existing ones as needed
     int getNextJobID();
 };

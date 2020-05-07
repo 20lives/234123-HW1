@@ -60,14 +60,6 @@ class QuitCommand : public BuiltInCommand {
     void execute() override;
 };
 
-class HistoryCommand : public BuiltInCommand {
-// TODO: Add your data members
-public:
-    HistoryCommand(const char* cmd_line, CommandsHistory* history);
-    virtual ~HistoryCommand() {}
-    void execute() override;
-};
-
 class JobsCommand : public BuiltInCommand {
 // TODO: Add your data members
 public:
@@ -79,7 +71,7 @@ public:
 class KillCommand : public BuiltInCommand {
     // TODO: Add your data members
 public:
-    KillCommand(const char* cmd_line, JobsList* jobs);
+    KillCommand(const char* cmd_line/*, JobsList* jobs*/);
     virtual ~KillCommand() {}
     void execute() override;
 };
