@@ -55,3 +55,11 @@ pid_t JobsList::getJobPid(int jobId) {
     // find pid with given jobId
     return 0;
 }
+
+bool JobsList::isEmpty() {
+    return jobsList.empty();
+}
+
+bool JobsList::isIn(int jobId) {
+    return false;
+}

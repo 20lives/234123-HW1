@@ -21,6 +21,40 @@ enum CD_TYPE {
 /**
  * Aux functions
  */
+int _strToInt(char *arg) {
+    return atoi(arg);
+}
+
+bool _isInteger(char *arg) {
+    string s = string(arg);
+    if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
+    char * p;
+    strtol(s.c_str(), &p, 10);
+    return (*p == 0);
+}
+
+void _handleArgsForKillCmd(char **argv, int argc) {
+    // the kill cmd should be as following: kill -<num> <num>
+    bool isValidArgs = true;
+    if (argc != 3) {
+        isValidArgs = false;
+    }
+    if ((string(argv[1]).length() <= 1)) {
+        isValidArgs = false;
+    }
+    if (argv[1][0] != '-') {
+        isValidArgs = false;
+    }
+    // erase the '-' char
+    memmove(argv[1], string(argv[1]).erase(0,1).c_str(),sizeof(argv[1] - 1));
+    if (!_isInteger(argv[1]) || !_isInteger(argv[2])) {
+        isValidArgs = false;
+    }
+    if (!isValidArgs) {
+        std::cerr << "smash error: kill: invalid arguments" << "\n";
+    }
+}
+
 void  _changeDirectory(CD_TYPE cdType, char* dir = nullptr) {
     SmallShell& smash = SmallShell::getInstance();
     char currWorkingDir[COMMAND_ARGS_MAX_LENGTH] = {};
@@ -70,6 +104,10 @@ KillCommand::KillCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {
 
 }
 
+ForegroundCommand::ForegroundCommand(const char *cmd_line) : BuiltInCommand(cmd_line){
+
+}
+
 BuiltInCommand::~BuiltInCommand() {
     _freeFields(argv, argc);
 }
@@ -110,40 +148,6 @@ void CdCommand::execute() {
     }
 }
 
-int _strToInt(char *arg) {
-    return atoi(arg);
-}
-
-bool _isInteger(char *arg) {
-    string s = string(arg);
-    if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
-    char * p;
-    strtol(s.c_str(), &p, 10);
-    return (*p == 0);
-}
-
-void _handleArgsForKillCmd(char **argv, int argc) {
-    // the kill cmd should be as following: kill -<num> <num>
-    bool isValidArgs = true;
-    if (argc != 3) {
-        isValidArgs = false;
-    }
-    if ((string(argv[1]).length() <= 1)) {
-        isValidArgs = false;
-    }
-    if (argv[1][0] != '-') {
-        isValidArgs = false;
-    }
-    // erase the '-' char
-    memmove(argv[1], string(argv[1]).erase(0,1).c_str(),sizeof(argv[1] - 1));
-    if (!_isInteger(argv[1]) || !_isInteger(argv[2])) {
-        isValidArgs = false;
-    }
-    if (!isValidArgs) {
-        std::cerr << "smash error: kill: invalid arguments" << "\n";
-    }
-}
-
 void KillCommand::execute() {
     _handleArgsForKillCmd(argv, argc);
     JobsList& jobsList = JobsList::getInstance();
@@ -156,8 +160,33 @@ void KillCommand::execute() {
         return;
     }
     // send signal to process
-
     kill(jobPid, sig);
+}
+
+void ForegroundCommand::execute() {
+    if (argc > 2 || argv[1] && !_isInteger(argv[1])) {
+        std::cerr << "smash error: fg: invalid arguments" << "\n";
+        return;
+    }
+    JobsList& jobsList = JobsList::getInstance();
+    // the command valid
+    if (argc == 1) {
+        // fg
+        if(jobsList.isEmpty()) {
+            std::cerr << "smash error: fg: jobs list is empty" << "\n";
+            return;
+        }
+        // jobs list is not empty
+
+    } else {
+        // fg <job-id>
+        char* jobId = (char*)malloc((string(argv[1])).length() + 1);
+        strcpy(jobId, argv[1]);
+        if (!jobsList.isIn(_strToInt(jobId))) {
+            std::cerr << "smash error: fg: job-id " << jobId << " does not exist" << "\n";
+        }
+        // the jobId exists in jobs list
+    }
 }
 
 /**
