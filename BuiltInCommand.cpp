@@ -33,26 +33,29 @@ bool _isInteger(char *arg) {
     return (*p == 0);
 }
 
-void _handleArgsForKillCmd(char **argv, int argc) {
+bool _handleArgsForKillCmd(char **argv, int argc) {
     // the kill cmd should be as following: kill -<num> <num>
     bool isValidArgs = true;
     if (argc != 3) {
         isValidArgs = false;
     }
-    if ((string(argv[1]).length() <= 1)) {
+    if (isValidArgs && (string(argv[1]).length() <= 1)) {
         isValidArgs = false;
     }
-    if (argv[1][0] != '-') {
+    if (isValidArgs && argv[1][0] != '-') {
         isValidArgs = false;
     }
     // erase the '-' char
-    memmove(argv[1], string(argv[1]).erase(0,1).c_str(),sizeof(argv[1] - 1));
-    if (!_isInteger(argv[1]) || !_isInteger(argv[2])) {
-        isValidArgs = false;
+    if (isValidArgs) {
+        memmove(argv[1], string(argv[1]).erase(0, 1).c_str(), sizeof(argv[1] - 1));
+        if (!_isInteger(argv[1]) || !_isInteger(argv[2])) {
+            isValidArgs = false;
+        }
     }
     if (!isValidArgs) {
         std::cerr << "smash error: kill: invalid arguments" << "\n";
     }
+    return isValidArgs;
 }
 
 void  _changeDirectory(CD_TYPE cdType, char* dir = nullptr) {
@@ -112,6 +115,10 @@ BackgroundCommand::BackgroundCommand(const char *cmd_line) : BuiltInCommand(cmd_
 
 }
 
+QuitCommand::QuitCommand(const char *cmd_line) : BuiltInCommand(cmd_line){
+
+}
+
 BuiltInCommand::~BuiltInCommand() {
     _freeFields(argv, argc);
 }
@@ -153,18 +160,20 @@ void CdCommand::execute() {
 }
 
 void KillCommand::execute() {
-    _handleArgsForKillCmd(argv, argc);
+    bool isVaildArgs = _handleArgsForKillCmd(argv, argc);
     JobsList& jobsList = JobsList::getInstance();
-    int sig = _strToInt(argv[2]);
-    int jobId = _strToInt(argv[2]);
-    pid_t jobPid = jobsList.getJobPid(jobId);
-    // assuming getJobById is returning NULL if there is no job associated with the same id
-    if (jobPid == -1) {
-        std::cerr << "smash error: kill: job-id " << jobId << " does not exist" << "\n";
-        return;
+    if (isVaildArgs) {
+        int sig = _strToInt(argv[2]);
+        int jobId = _strToInt(argv[2]);
+        pid_t jobPid = jobsList.getJobPid(jobId);
+        // assuming getJobById is returning NULL if there is no job associated with the same id
+        if (jobPid == -1) {
+            std::cerr << "smash error: kill: job-id " << jobId << " does not exist" << "\n";
+            return;
+        }
+        // send signal to process
+        kill(jobPid, sig);
     }
-    // send signal to process
-    kill(jobPid, sig);
 }
 
 void ForegroundCommand::execute() {
@@ -214,6 +223,14 @@ void BackgroundCommand::execute() {
     // then the following error message should be reported:
     // smash error: bg: job-id <job-id> is already running in the background
 
+}
+
+void QuitCommand::execute() {
+    if (argc == 2 && strcmp(argv[2], "kill") == 0) {
+        // cmd is quit kill
+    } else if (argc == 1) {
+        // cmd is quit
+    }
 }
 
 /**

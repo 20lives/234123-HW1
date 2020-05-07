@@ -29,6 +29,8 @@ void _setCmdType(char *cmd, CMD_TYPE *eCmdType) {
         *eCmdType = eFg;
     } else if ((strcmp(cmd, "bg") == 0)){
         *eCmdType = eBg;
+    } else if ((strcmp(cmd, "quit") == 0)){
+        *eCmdType = eQuit;
     } else {
         *eCmdType = eExternal;
     }
@@ -107,6 +109,8 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
         return new ForegroundCommand(cmdLine);
     } else if (eCmdType == eBg) {
         return new BackgroundCommand(cmdLine);
+    } else if (eCmdType == eQuit) {
+        return new QuitCommand(cmdLine);
     } else {
         // external cmd is the last possibly
         return new ExternalCommand(cmdLine, isBackgroundCmd);
