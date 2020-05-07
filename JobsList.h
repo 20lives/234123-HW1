@@ -19,7 +19,7 @@ private:
         Command* cmd;
         bool isStopped;
         int jobId;
-        time_t time;
+        time_t startTime;
         pid_t jobPid;
     public:
         JobEntry(Command* _cmd, bool _isStopped, int _jobId);

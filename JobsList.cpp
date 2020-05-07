@@ -3,6 +3,7 @@
 //
 
 #include <vector>
+#include <time.h>
 
 #include "JobsList.h"
 
@@ -17,7 +18,7 @@ JobsList::JobsList() {
 }
 
 JobsList::JobEntry::JobEntry(Command *_cmd, bool _isStopped, int _jobId) : cmd(_cmd), isStopped(_isStopped), jobId(_jobId) {
-    //std::time(&time);
+    startTime = time(0);
 }
 
 JobsList::~JobsList() {

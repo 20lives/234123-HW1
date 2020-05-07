@@ -222,7 +222,6 @@ void BackgroundCommand::execute() {
     // If job-id exists but it is for a job which is already running in the background (not stopped)
     // then the following error message should be reported:
     // smash error: bg: job-id <job-id> is already running in the background
-
 }
 
 void QuitCommand::execute() {
