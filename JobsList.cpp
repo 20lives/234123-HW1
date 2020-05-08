@@ -114,3 +114,11 @@ JobsList::JobEntry *JobsList::getJobById(int jobId) {
     }
     return nullptr;
 }
+
+int JobsList::getJobsCount() {
+    return jobsList.size();
+}
+
+void JobsList::killAllJobs() {
+    // kill all jobs with the msg: <job-pid>: <cmd-line>
+}

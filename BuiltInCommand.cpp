@@ -229,11 +229,26 @@ void BackgroundCommand::execute() {
     // smash error: bg: job-id <job-id> is already running in the background
 }
 
+bool _isKill(char **args, int num) {
+    for (int i = 0 ; i < num ; i++) {
+        if(strcmp(args[i], "kill") == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void QuitCommand::execute() {
-    if (argc == 2 && strcmp(argv[2], "kill") == 0) {
+    bool isKill = false;
+    if (_isKill(argv, argc) == 0) {
         // cmd is quit kill
-    } else if (argc == 1) {
+        JobsList& jobsList = JobsList::getInstance();
+        int jobsCount = jobsList.getJobsCount();
+        std::cout << "smash: sending SIGKILL signal to " << jobsCount << " jobs:" << "\n";
+        jobsList.killAllJobs();
+    } else  {
         // cmd is quit
+        exit(0);
     }
 }
 
