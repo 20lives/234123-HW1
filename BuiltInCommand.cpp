@@ -240,7 +240,7 @@ bool _isKill(char **args, int num) {
 
 void QuitCommand::execute() {
     bool isKill = false;
-    if (_isKill(argv, argc) == 0) {
+    if (_isKill(argv, argc)) {
         // cmd is quit kill
         JobsList& jobsList = JobsList::getInstance();
         int jobsCount = jobsList.getJobsCount();
