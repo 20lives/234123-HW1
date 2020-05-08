@@ -47,7 +47,7 @@ void JobsList::addJob(string command, pid_t pid, bool isStopped) {
 }
 
 int JobsList::getNextJobID() {
-    int maxId = -1;
+    int maxId = 0;
     for(const auto& entry : jobsList) {
         maxId = entry->getJobId() > maxId ? entry->getJobId() : maxId;
     }
