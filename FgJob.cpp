@@ -25,7 +25,7 @@ pid_t FgJob::getPid() {
 
 void FgJob::clearFg() {
     isFgJob = false;
-    memset(cmdLine, 0, 255);
+    memset(cmdLine, 0, COMMAND_ARGS_MAX_LENGTH);
     cmdLineLength = 0;
     pid = -1;
 }
