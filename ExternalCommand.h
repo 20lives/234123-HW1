@@ -22,6 +22,7 @@ public:
     void execute() override;
     void setPid(pid_t _pid);
     pid_t getPid();
+    string getCommandLine();
 };
 
 #endif //HW1_234123_EXTERNALCOMMAND_H

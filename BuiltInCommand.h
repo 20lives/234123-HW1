@@ -53,6 +53,7 @@ public:
 };
 
 class JobsList;
+
 class QuitCommand : public BuiltInCommand {
     // TODO: Add your data members public:
 public:
@@ -64,7 +65,7 @@ public:
 class JobsCommand : public BuiltInCommand {
 // TODO: Add your data members
 public:
-    JobsCommand(const char* cmd_line, JobsList* jobs);
+    JobsCommand(const char* cmd_line);
     virtual ~JobsCommand() {}
     void execute() override;
 };
