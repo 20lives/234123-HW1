@@ -31,6 +31,8 @@ void _setCmdType(char *cmd, CMD_TYPE *eCmdType) {
         *eCmdType = eBg;
     } else if ((strcmp(cmd, "quit") == 0)){
         *eCmdType = eQuit;
+    } else if ((strcmp(cmd, "jobs") == 0)){
+        *eCmdType = eJobs;
     } else {
         *eCmdType = eExternal;
     }
