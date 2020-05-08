@@ -97,27 +97,31 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
     // 4. free the cmdLine
     _freeFields(argv, argc);
     // 5. create te command
-    if (eCmdType == eChprompt) {
-        return new ChangePromptCommand(cmdLine);
-    } else if (eCmdType == eShowpid) {
-        return new ShowPidCommand(cmdLine);
-    } else if (eCmdType == ePwd) {
-        return new PwdCommand(cmdLine);
-    } else if (eCmdType == eCd) {
-        return new CdCommand(cmdLine);
-    } else if (eCmdType == eKill) {
-        return new KillCommand(cmdLine);
-    } else if (eCmdType == eFg) {
-        return new ForegroundCommand(cmdLine);
-    } else if (eCmdType == eBg) {
-        return new BackgroundCommand(cmdLine);
-    } else if (eCmdType == eQuit) {
-        return new QuitCommand(cmdLine);
-    } else {
-        // external cmd is the last possibly
-        return new ExternalCommand(cmdLine, isBackgroundCmd);
+
+    switch(eCmdType) {
+        case eChprompt:
+            return new ChangePromptCommand(cmdLine);
+        case eShowpid:
+            return new ShowPidCommand(cmdLine);
+        case ePwd:
+            return new PwdCommand(cmdLine);
+        case eCd:
+            return new CdCommand(cmdLine);
+        case eKill:
+            return new KillCommand(cmdLine);
+        case eFg:
+            return new ForegroundCommand(cmdLine);
+        case eBg:
+            return new BackgroundCommand(cmdLine);
+        case eQuit:
+            return new QuitCommand(cmdLine);
+        case eJobs:
+            return new JobsCommand(cmdLine);
+        case eExternal:
+            return new ExternalCommand(cmd_line, isBackgroundCmd);
+        default:
+            return nullptr;
     }
-    return nullptr;
 }
 
 void SmallShell::executeCommand(const char *cmd_line) {
