@@ -164,9 +164,9 @@ void CdCommand::execute() {
 }
 
 void KillCommand::execute() {
-    bool isVaildArgs = _handleArgsForKillCmd(argv, argc);
+    bool isValidArgs = _handleArgsForKillCmd(argv, argc);
     JobsList& jobsList = JobsList::getInstance();
-    if (isVaildArgs) {
+    if (isValidArgs) {
         int sig = _strToInt(argv[2]);
         int jobId = _strToInt(argv[2]);
         pid_t jobPid = jobsList.getJobPid(jobId);
@@ -177,6 +177,7 @@ void KillCommand::execute() {
         }
         // send signal to process
         kill(jobPid, sig);
+        std::cout << "signal number " << sig << " was sent to pid " << jobPid << "\n";
     }
 }
 

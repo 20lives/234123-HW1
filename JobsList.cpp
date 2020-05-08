@@ -77,7 +77,7 @@ pid_t JobsList::getJobPid(int jobId) {
         }
     }
     // return 0 ?????
-    return 0;
+    return -1;
 }
 
 bool JobsList::isEmpty() {
