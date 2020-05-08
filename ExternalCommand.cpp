@@ -26,7 +26,6 @@ ExternalCommand::ExternalCommand(const char* cmd_line, bool _isBackgroundCmd) : 
  */
 void ExternalCommand::execute() {
     // update args array
-    JobsList& list = JobsList::getInstance();
     char *args[4] = {};
     args[0] = (char*)malloc(string("/bin/bash").length() + 1);
     strcpy(args[0], "/bin/bash");
@@ -46,10 +45,11 @@ void ExternalCommand::execute() {
             FgJob& fgJob = FgJob::getInstance();
             fgJob.updateFg(cmdLine, pid);
             // in case this is not a background cmd we will wait for the child process to finish
-            wait(NULL);
+            waitpid(pid, NULL, WUNTRACED);
             fgJob.clearFg();
         } else {
             // running in the background initially
+            JobsList& list = JobsList::getInstance();
             list.addJob(cmdLine, pid);
         }
     }
