@@ -46,7 +46,7 @@ void ExternalCommand::execute() {
             wait(NULL);
         } else {
             // running in the background initially
-            list.addJob(this, pid);
+            list.addJob(cmdLine, pid);
         }
     }
 }
@@ -60,4 +60,8 @@ pid_t ExternalCommand::getPid() {
 
 void ExternalCommand::setPid(pid_t _pid) {
     pid = _pid;
+}
+
+string ExternalCommand::getCommandLine() {
+    return cmdLine;
 }

@@ -4,8 +4,10 @@
 
 #include <vector>
 #include <time.h>
+#include <iostream>
 
 #include "JobsList.h"
+#include "ExternalCommand.h"
 
 /**
  * Aux functions
@@ -17,7 +19,7 @@ JobsList::JobsList() {
     jobsList = {};
 }
 
-JobsList::JobEntry::JobEntry(Command *_cmd, bool _isStopped, int _jobId, pid_t _pid) : cmd(_cmd), isStopped(_isStopped), jobId(_jobId), jobPid(_pid) {
+JobsList::JobEntry::JobEntry(string _command, bool _isStopped, int _jobId, pid_t _pid) : command(_command), isStopped(_isStopped), jobId(_jobId), jobPid(_pid) {
     startTime = time(0);
 }
 
@@ -38,9 +40,9 @@ int JobsList::JobEntry::getJobId() {
 /**
  * other class methods
  */
-void JobsList::addJob(Command* cmd, pid_t pid, bool isStopped) {
+void JobsList::addJob(string command, pid_t pid, bool isStopped) {
     int jobId = getNextJobID(); // first jobId should be 1 !!
-    JobEntry* entry = new JobEntry(cmd, isStopped, jobId, pid);
+    JobEntry* entry = new JobEntry(command, isStopped, jobId, pid);
     jobsList.push_front(entry);
 }
 

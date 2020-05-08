@@ -11,18 +11,19 @@
 #include <vector>
 #include "signals.h"
 #include "Commands.h"
+#include "ExternalCommand.h"
 
 class JobsList {
 private:
     class JobEntry {
     private:
-        Command* cmd;
+        string command;
         bool isStopped;
         int jobId;
         time_t startTime;
         pid_t jobPid;
     public:
-        JobEntry(Command* _cmd, bool _isStopped, int _jobId, pid_t _pid);
+        JobEntry(string _command, bool _isStopped, int _jobId, pid_t _pid);
         int getJobId();
         //void setJobId(int _jobId);
     };
@@ -36,7 +37,7 @@ public:
         return instance;
     }
     ~JobsList();
-    void addJob(Command* cmd, pid_t pid, bool isStopped = false);
+    void addJob(string command, pid_t pid, bool isStopped = false);
     void printJobsList();
     void killAllJobs();
     void removeFinishedJobs();
