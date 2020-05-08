@@ -125,6 +125,12 @@ int JobsList::getJobsCount() {
 }
 
 void JobsList::killAllJobs() {
+    for(const auto& entry : jobsList) {
+        kill(entry->getPid(), SIGKILL);
+        std::cout << entry->getPid()<< " : " << entry->getCommandLine() << "\n";
+    }
+}
+
 void JobsList::removeFinishedJobs() {
     _List_iterator<JobEntry *> i = jobsList.begin();
     while (i != jobsList.end()) {
