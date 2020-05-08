@@ -5,6 +5,9 @@
 #include <vector>
 #include <time.h>
 #include <iostream>
+#include <wait.h>
+#include <unistd.h>
+
 
 #include "JobsList.h"
 #include "ExternalCommand.h"
@@ -94,6 +97,7 @@ bool JobsList::isIn(int jobId) {
 }
 
 void JobsList::printJobsList() {
+    removeFinishedJobs();
     jobsList.sort();
     for(const auto& entry : jobsList) {
         std::cout <<  "[" << entry->getJobId() << "] "
@@ -121,5 +125,20 @@ int JobsList::getJobsCount() {
 }
 
 void JobsList::killAllJobs() {
-    // kill all jobs with the msg: <job-pid>: <cmd-line>
+void JobsList::removeFinishedJobs() {
+    _List_iterator<JobEntry *> i = jobsList.begin();
+    while (i != jobsList.end()) {
+        pid_t pid = (*i)->getPid();
+        string command = (*i)->getCommandLine();
+        pid_t status = waitpid(pid, NULL, WNOHANG) ;
+        cout << command << " " << status << "\n";
+
+        if (status == -1) {
+            // jobsList.erase(i++);
+            i++;
+        }
+        else {
+            i++;
+        }
+    }
 }
