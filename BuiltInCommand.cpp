@@ -119,6 +119,10 @@ QuitCommand::QuitCommand(const char *cmd_line) : BuiltInCommand(cmd_line){
 
 }
 
+JobsCommand::JobsCommand(const char *cmd_line) : BuiltInCommand(cmd_line) {
+
+}
+
 BuiltInCommand::~BuiltInCommand() {
     _freeFields(argv, argc);
 }
@@ -231,6 +235,12 @@ void QuitCommand::execute() {
         // cmd is quit
     }
 }
+
+void JobsCommand::execute() {
+    JobsList& jobsList = JobsList::getInstance();
+    jobsList.printJobsList();
+}
+
 
 /**
  * getters and setters
