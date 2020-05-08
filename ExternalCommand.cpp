@@ -11,6 +11,7 @@
 #include "Utilities.h"
 #include "Commands.h"
 #include "JobsList.h"
+#include "FgJob.h"
 
 /**
  * Constructors and destructors
@@ -42,8 +43,11 @@ void ExternalCommand::execute() {
     } else {
         // parent pid
         if (!isBackgroundCmd){
+            FgJob& fgJob = FgJob::getInstance();
+            fgJob.updateFg(cmdLine, pid);
             // in case this is not a background cmd we will wait for the child process to finish
             wait(NULL);
+            fgJob.clearFg();
         } else {
             // running in the background initially
             list.addJob(cmdLine, pid);

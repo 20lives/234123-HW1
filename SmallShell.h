@@ -6,12 +6,14 @@
 #define HW1_234123_SMALLSHELL_H
 
 #include "Commands.h"
+#include "FgJob.h"
 
 class Command;
 class SmallShell {
 private:
     std::string prevDir = "";
     std::string prompt = "smash";
+    FgJob *currFgJob = NULL; // current foreground job - send signals to it if needed
     SmallShell();
 public:
     bool isPrevDirSet = false;
