@@ -22,9 +22,9 @@ private:
         time_t startTime;
         pid_t jobPid;
     public:
-        JobEntry(Command* _cmd, bool _isStopped, int _jobId);
+        JobEntry(Command* _cmd, bool _isStopped, int _jobId, pid_t _pid);
         int getJobId();
-        void setJobId(int _jobId);
+        //void setJobId(int _jobId);
     };
     std::list<JobEntry*> jobsList;
     JobsList();
@@ -36,7 +36,7 @@ public:
         return instance;
     }
     ~JobsList();
-    void addJob(Command* cmd, bool isStopped = false);
+    void addJob(Command* cmd, pid_t pid, bool isStopped = false);
     void printJobsList();
     void killAllJobs();
     void removeFinishedJobs();

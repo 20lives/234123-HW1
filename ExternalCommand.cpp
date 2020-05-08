@@ -47,7 +47,7 @@ void ExternalCommand::execute() {
             wait(NULL);
         } else {
             // running in the background initially
-            list.addJob(this, true);
+            list.addJob(this, pid);
         }
     }
 }
