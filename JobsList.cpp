@@ -77,7 +77,7 @@ pid_t JobsList::getJobPid(int jobId) {
         }
     }
     // return 0 ?????
-    return 0;
+    return -1;
 }
 
 bool JobsList::isEmpty() {
@@ -114,4 +114,12 @@ JobsList::JobEntry *JobsList::getJobById(int jobId) {
         }
     }
     return nullptr;
+}
+
+int JobsList::getJobsCount() {
+    return jobsList.size();
+}
+
+void JobsList::killAllJobs() {
+    // kill all jobs with the msg: <job-pid>: <cmd-line>
 }

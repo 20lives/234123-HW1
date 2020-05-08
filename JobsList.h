@@ -53,6 +53,7 @@ public:
     bool isIn(int jobId);
     // TODO: Add extra methods or modify existing ones as needed
     int getNextJobID();
+    int getJobsCount();
 };
 
 #endif //HW1_234123_JOBSLIST_H

@@ -164,9 +164,9 @@ void CdCommand::execute() {
 }
 
 void KillCommand::execute() {
-    bool isVaildArgs = _handleArgsForKillCmd(argv, argc);
+    bool isValidArgs = _handleArgsForKillCmd(argv, argc);
     JobsList& jobsList = JobsList::getInstance();
-    if (isVaildArgs) {
+    if (isValidArgs) {
         int sig = _strToInt(argv[2]);
         int jobId = _strToInt(argv[2]);
         pid_t jobPid = jobsList.getJobPid(jobId);
@@ -177,6 +177,7 @@ void KillCommand::execute() {
         }
         // send signal to process
         kill(jobPid, sig);
+        std::cout << "signal number " << sig << " was sent to pid " << jobPid << "\n";
     }
 }
 
@@ -228,11 +229,26 @@ void BackgroundCommand::execute() {
     // smash error: bg: job-id <job-id> is already running in the background
 }
 
+bool _isKill(char **args, int num) {
+    for (int i = 0 ; i < num ; i++) {
+        if(strcmp(args[i], "kill") == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void QuitCommand::execute() {
-    if (argc == 2 && strcmp(argv[2], "kill") == 0) {
+    bool isKill = false;
+    if (_isKill(argv, argc) == 0) {
         // cmd is quit kill
-    } else if (argc == 1) {
+        JobsList& jobsList = JobsList::getInstance();
+        int jobsCount = jobsList.getJobsCount();
+        std::cout << "smash: sending SIGKILL signal to " << jobsCount << " jobs:" << "\n";
+        jobsList.killAllJobs();
+    } else  {
         // cmd is quit
+        exit(0);
     }
 }
 
