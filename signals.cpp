@@ -4,6 +4,8 @@
 #include "signals.h"
 #include "FgJob.h"
 #include "JobsList.h"
+#include <sys/types.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -15,7 +17,7 @@ void ctrlCHandler(int sig_num) {
     if (fgJob.isFgJobRunning()) {
         pid_t pid = fgJob.getPid();
         if(kill(pid, SIGKILL) == 0) {
-            std::cout << "msg: \"smash: process " << pid <<" was killed" << "\n";
+            std::cout << "msg: smash: process " << pid <<" was killed" << "\n";
         }
     }
 }
@@ -28,9 +30,9 @@ void ctrlZHandler(int sig_num) {
 	if (fgJob.isFgJobRunning()) {
         pid_t pid = fgJob.getPid();
         JobsList& jobsList = JobsList::getInstance();
-        jobsList.addJob(fgJob.getCmdLine(), fgJob.getPid(), true);
+        jobsList.addJob(fgJob.getCmdLine(), pid, true);
         if(kill(pid, SIGSTOP) == 0) {
-            std::cout << "msg: \"smash: process " << pid <<" was stopped" << "\n";
+            std::cout << "msg: smash: process " << pid <<" was stopped" << "\n";
         }
     }
 }
