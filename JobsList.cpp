@@ -34,6 +34,22 @@ int JobsList::JobEntry::getJobId() {
     return jobId;
 }
 
+pid_t JobsList::JobEntry::getPid() {
+    return jobPid;
+}
+
+time_t JobsList::JobEntry::getElapsed() {
+    return (time(0) - startTime);
+}
+
+string JobsList::JobEntry::getCommandLine() {
+    return command;
+}
+
+bool JobsList::JobEntry::getIsStopped() {
+    return isStopped;
+}
+
 //void JobsList::JobEntry::setJobId(int _jobId) {
 //    jobId = _jobId;
 //}
@@ -55,7 +71,12 @@ int JobsList::getNextJobID() {
 }
 
 pid_t JobsList::getJobPid(int jobId) {
-    // find pid with given jobId
+    for(const auto& entry : jobsList) {
+        if (entry->getJobId() == jobId) {
+            return entry->getPid();
+        }
+    }
+    // return 0 ?????
     return 0;
 }
 
@@ -64,5 +85,32 @@ bool JobsList::isEmpty() {
 }
 
 bool JobsList::isIn(int jobId) {
+    for(const auto& entry : jobsList) {
+        if (entry->getJobId() == jobId) {
+            return true;
+        }
+    }
     return false;
+}
+
+void JobsList::printJobsList() {
+    for(const auto& entry : jobsList) {
+        std::cout <<  "[" << entry->getJobId() << "] "
+        << entry->getCommandLine() << " : " << entry->getPid() << " " << entry->getElapsed() << "secs";
+        if (entry->getIsStopped() )
+        {
+            std::cout << " (stopped)";
+        }
+        std::cout << "\n";
+        // [<job-id>] <command> : <process id> <seconds elapsed>
+    }
+}
+
+JobsList::JobEntry *JobsList::getJobById(int jobId) {
+    for(const auto& entry : jobsList) {
+        if (entry->getJobId() == jobId) {
+            return entry;
+        }
+    }
+    return nullptr;
 }

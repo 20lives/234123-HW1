@@ -25,7 +25,10 @@ private:
     public:
         JobEntry(string _command, bool _isStopped, int _jobId, pid_t _pid);
         int getJobId();
-        //void setJobId(int _jobId);
+        pid_t getPid();
+        time_t getElapsed();
+        string getCommandLine();
+        bool getIsStopped();
     };
     std::list<JobEntry*> jobsList;
     JobsList();
