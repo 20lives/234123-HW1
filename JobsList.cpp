@@ -94,6 +94,7 @@ bool JobsList::isIn(int jobId) {
 }
 
 void JobsList::printJobsList() {
+    jobsList.sort();
     for(const auto& entry : jobsList) {
         std::cout <<  "[" << entry->getJobId() << "] "
         << entry->getCommandLine() << " : " << entry->getPid() << " " << entry->getElapsed() << "secs";
