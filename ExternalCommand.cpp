@@ -17,7 +17,6 @@
  */
 ExternalCommand::ExternalCommand(const char* cmd_line, bool _isBackgroundCmd) : isBackgroundCmd(_isBackgroundCmd), Command(cmd_line) {
     strcpy(cmdLine, cmd_line);
-    _removeBackgroundSign(cmdLine);
     cmdLineLength = string(cmd_line).length();
 }
 
