@@ -33,3 +33,7 @@ void FgJob::clearFg() {
 bool FgJob::isFgJobRunning() {
     return isFgJob;
 }
+
+const char *FgJob::getCmdLine() {
+    return cmdLine;
+}

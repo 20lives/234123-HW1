@@ -3,6 +3,7 @@
 
 #include "signals.h"
 #include "FgJob.h"
+#include "JobsList.h"
 
 using namespace std;
 
@@ -14,7 +15,7 @@ void ctrlCHandler(int sig_num) {
     if (fgJob.isFgJobRunning()) {
         pid_t pid = fgJob.getPid();
         if(kill(pid, SIGKILL) == 0) {
-            std::cout << "msg: \"smash: process " << pid <<" was stopped" << "\n";
+            std::cout << "msg: \"smash: process " << pid <<" was killed" << "\n";
         }
     }
 }
@@ -22,12 +23,16 @@ void ctrlCHandler(int sig_num) {
 void ctrlZHandler(int sig_num) {
 	// TODO: Add your implementation
 	// send SIGTSTP to the process in the foreground: add the foreground process to the jobslist
-//	std::cout << "smash: got ctrl-Z" << "\n";
-//	FgJob& fgJob = FgJob::getInstance();
-//	if (fgJob.isFgJobRunning()) {
-//        pid_t pid = fgJob.getPid();
-//        // msg: "smash: process <foreground-PID> was stopped"
-//    }
+	std::cout << "smash: got ctrl-Z" << "\n";
+	FgJob& fgJob = FgJob::getInstance();
+	if (fgJob.isFgJobRunning()) {
+        pid_t pid = fgJob.getPid();
+        JobsList& jobsList = JobsList::getInstance();
+        jobsList.addJob(fgJob.getCmdLine(), fgJob.getPid(), true);
+        if(kill(pid, SIGSTOP) == 0) {
+            std::cout << "msg: \"smash: process " << pid <<" was stopped" << "\n";
+        }
+    }
 }
 
 void alarmHandler(int sig_num) {

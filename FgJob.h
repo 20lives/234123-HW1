@@ -27,6 +27,7 @@ public:
     void updateFg(const char* _cmdLine, pid_t _pid);
     void clearFg();
     pid_t getPid();
+    const char* getCmdLine();
     bool isFgJobRunning();
     ~FgJob();
 };
