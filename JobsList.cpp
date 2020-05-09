@@ -53,6 +53,10 @@ bool JobsList::JobEntry::getIsStopped() {
     return isStopped;
 }
 
+void JobsList::JobEntry::setContinue() {
+  isStopped = false;
+}
+
 //void JobsList::JobEntry::setJobId(int _jobId) {
 //    jobId = _jobId;
 //}
@@ -149,4 +153,26 @@ void JobsList::removeFinishedJobs() {
 
 string JobsList::getJobCommnad(int jobId) {
     return getJobById(jobId)->getCommandLine();
+}
+
+int JobsList::getLastJob() {
+    if (isEmpty()) return -1;
+    return jobsList.back()->getJobId();
+}
+
+int JobsList::getLastStoppedJob() {
+    for (auto i = jobsList.crbegin(); i != jobsList.crend(); ++i) {
+        if((*i)->getIsStopped()) {
+            return (*i)->getJobId();
+        }
+    }
+    return -1;
+}
+
+bool JobsList::getIsStopped(int jobId) {
+    return getJobById(jobId)->getIsStopped();
+}
+
+void JobsList::setContinue(int jobId) {
+    getJobById(jobId)->setContinue();
 }

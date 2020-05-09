@@ -211,22 +211,27 @@ void BackgroundCommand::execute() {
         return;
     }
     JobsList& jobsList = JobsList::getInstance();
+    int jobId;
     if (argc == 1) {
-        // bg
-        // If bg was typed with no arguments (without job-id) but jobs list does not contain any
-        // stopped job to resume in the background then the following error message should be
-        // reported:
-        // smash error: bg: there is no stopped jobs to resume
+        jobId = jobsList.getLastStoppedJob();
+        if (jobId == -1) {
+            std::cerr << "smash error: bg: there is no stopped jobs to resume" << "\n";
+            return;
+        }
     } else {
-        // bg <job-id>
-        int jobId = _strToInt(argv[1]);
-        if (!jobsList.isIn(_strToInt(argv[1]))) {
+        jobId = _strToInt(argv[1]);
+        if (!jobsList.isIn(jobId)) {
             std::cerr << "smash error: bg job-id " << jobId << " does not exist" << "\n";
+            return;
+        }
+        if (!jobsList.getIsStopped(jobId)) {
+            std::cerr << "smash error: bg job-id " << jobId << " is already running in the background" << "\n";
+            return;
         }
     }
-    // If job-id exists but it is for a job which is already running in the background (not stopped)
-    // then the following error message should be reported:
-    // smash error: bg: job-id <job-id> is already running in the background
+    jobsList.setContinue(jobId);
+    cout << jobsList.getJobCommnad(jobId) << " : " << jobsList.getJobPid(jobId) << "\n";
+    kill(jobsList.getJobPid(jobId), SIGCONT);
 }
 
 bool _isKill(char **args, int num) {
