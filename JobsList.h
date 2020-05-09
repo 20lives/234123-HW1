@@ -30,6 +30,8 @@ private:
         string getCommandLine();
         bool getIsStopped();
         void setContinue();
+        void resetElapsed();
+        void setIsStopped(bool _isStopped);
     };
     std::list<JobEntry*> jobsList;
     JobsList();
@@ -46,6 +48,7 @@ public:
     void killAllJobs();
     void removeFinishedJobs();
     JobEntry * getJobById(int jobId);
+    int getJobByPid(pid_t pid);
     void removeJobById(int jobId);
     int getLastJob();
     int getLastStoppedJob();

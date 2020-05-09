@@ -6,11 +6,13 @@
 #include <string.h>
 #include <iostream>
 #include <signal.h>
+#include <wait.h>
 
 #include "BuiltInCommand.h"
 #include "Commands.h"
 #include "JobsList.h"
 #include "Utilities.h"
+#include "FgJob.h"
 
 using namespace std;
 
@@ -187,22 +189,29 @@ void ForegroundCommand::execute() {
         return;
     }
     JobsList& jobsList = JobsList::getInstance();
-    // the command valid
+    int jobId;
     if (argc == 1) {
         // fg
         if(jobsList.isEmpty()) {
             std::cerr << "smash error: fg: jobs list is empty" << "\n";
             return;
         }
-        // jobs list is not empty
+        jobId = jobsList.getLastJob();
     } else {
-        // fg <job-id>
-        int jobId = _strToInt(argv[1]);
+        jobId = _strToInt(argv[1]);
         if (!jobsList.isIn(jobId)) {
             std::cerr << "smash error: fg: job-id " << jobId << " does not exist" << "\n";
         }
-        // the jobId exists in jobs list
     }
+    cout << jobsList.getJobCommnad(jobId) << " : " << jobsList.getJobPid(jobId) << "\n";
+    pid_t pid = jobsList.getJobPid(jobId);
+    string cmdLine = jobsList.getJobCommnad(jobId);
+    kill(pid, SIGCONT);
+
+    FgJob& fgJob = FgJob::getInstance();
+    fgJob.updateFg(cmdLine.c_str(), pid);
+
+    waitpid(pid, NULL, WUNTRACED);
 }
 
 void BackgroundCommand::execute() {

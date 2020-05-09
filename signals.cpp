@@ -29,8 +29,12 @@ void ctrlZHandler(int sig_num) {
 	FgJob& fgJob = FgJob::getInstance();
 	if (fgJob.isFgJobRunning()) {
         pid_t pid = fgJob.getPid();
+        fgJob.clearFg();
+
         JobsList& jobsList = JobsList::getInstance();
+
         jobsList.addJob(fgJob.getCmdLine(), pid, true);
+
         if(kill(pid, SIGSTOP) == 0) {
             std::cout << "msg: smash: process " << pid <<" was stopped" << "\n";
         }

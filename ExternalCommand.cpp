@@ -47,7 +47,6 @@ void ExternalCommand::execute() {
             fgJob.updateFg(rawCmdLine, pid);
             // in case this is not a background cmd we will wait for the child process to finish
             waitpid(pid, NULL, WUNTRACED);
-            fgJob.clearFg();
         } else {
             // running in the background initially
             JobsList& list = JobsList::getInstance();

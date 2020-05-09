@@ -57,6 +57,14 @@ void JobsList::JobEntry::setContinue() {
   isStopped = false;
 }
 
+void JobsList::JobEntry::resetElapsed() {
+    startTime = time(0);
+}
+
+void JobsList::JobEntry::setIsStopped(bool _isStopped) {
+    isStopped = _isStopped;
+}
+
 //void JobsList::JobEntry::setJobId(int _jobId) {
 //    jobId = _jobId;
 //}
@@ -64,17 +72,22 @@ void JobsList::JobEntry::setContinue() {
  * other class methods
  */
 void JobsList::addJob(string command, pid_t pid, bool isStopped) {
-    int jobId = getNextJobID(); // first jobId should be 1 !!
-    JobEntry* entry = new JobEntry(command, isStopped, jobId, pid);
-    jobsList.push_back(entry);
+    int jobId = getJobByPid(pid);
+
+    if (jobId != -1) {
+        getJobById(jobId)->resetElapsed();
+        getJobById(jobId)->setIsStopped(isStopped);
+        // set isStopped;
+        return;
+    } else {
+        jobId = getNextJobID();
+        JobEntry *entry = new JobEntry(command, isStopped, jobId, pid);
+        jobsList.push_back(entry);
+    }
 }
 
 int JobsList::getNextJobID() {
-    int maxId = 0;
-    for(const auto& entry : jobsList) {
-        maxId = entry->getJobId() > maxId ? entry->getJobId() : maxId;
-    }
-    return maxId + 1;
+    return  getLastJob() + 1;
 }
 
 pid_t JobsList::getJobPid(int jobId) {
@@ -83,7 +96,6 @@ pid_t JobsList::getJobPid(int jobId) {
             return entry->getPid();
         }
     }
-    // return 0 ?????
     return -1;
 }
 
@@ -156,7 +168,7 @@ string JobsList::getJobCommnad(int jobId) {
 }
 
 int JobsList::getLastJob() {
-    if (isEmpty()) return -1;
+    if (isEmpty()) return 0;
     return jobsList.back()->getJobId();
 }
 
@@ -175,4 +187,11 @@ bool JobsList::getIsStopped(int jobId) {
 
 void JobsList::setContinue(int jobId) {
     getJobById(jobId)->setContinue();
+}
+
+int JobsList::getJobByPid(pid_t pid) {
+    for(const auto& entry : jobsList) {
+        if (entry->getPid() == pid) return entry->getJobId();
+    }
+    return -1;
 }
