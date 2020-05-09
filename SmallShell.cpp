@@ -10,12 +10,28 @@
 #include "Commands.h"
 #include "BuiltInCommand.h"
 #include "ExternalCommand.h"
+#include "RedirectionCommand.h"
+#include "PipeCommand.h"
 
 /**
  * Aux functions
  */
-void _setCmdType(char *cmd, CMD_TYPE *eCmdType) {
-    if (strcmp(cmd, "chprompt") == 0) {
+void _setCmdType(char *cmdLine, char *cmd, CMD_TYPE *eCmdType) {
+    string sCmdLine = string(cmdLine);
+    bool isRedirectionAppend = (sCmdLine.find(">>") != std::string::npos);
+    bool isRedirection = !isRedirectionAppend && (sCmdLine.find(">") != std::string::npos);
+    bool isPipeErr = (sCmdLine.find("|&") != std::string::npos);
+    bool isPipe = !isPipeErr && (sCmdLine.find("|") != std::string::npos);
+
+    if (isRedirectionAppend) {
+        *eCmdType = eRedAppend;
+    } else if (isRedirection) {
+        *eCmdType = eRed;
+    } else if (isPipeErr) {
+        *eCmdType = ePipeErr;
+    } else if (isPipe) {
+        *eCmdType = ePipe;
+    } else if (strcmp(cmd, "chprompt") == 0) {
         *eCmdType = eChprompt;
     } else if (strcmp(cmd, "showpid") == 0) {
         *eCmdType = eShowpid;
@@ -93,7 +109,7 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
     _removeBackgroundSign(cmdLine);
     // now we have the cmd line with out the last & and we have a boolean value indicating if this is a background cmd
     // 3. set cmd type
-    _setCmdType(argv[0], &eCmdType);
+    _setCmdType(cmdLine, argv[0], &eCmdType);
     // 4. free the cmdLine
     _freeFields(argv, argc);
     // 5. create te command
@@ -117,6 +133,14 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
             return new QuitCommand(cmdLine);
         case eJobs:
             return new JobsCommand(cmdLine);
+        case eRed:
+            return new RedirectionCommand(cmd_line, isBackgroundCmd, false);
+        case eRedAppend:
+            return new RedirectionCommand(cmd_line, isBackgroundCmd, true);
+        case ePipe:
+            return new PipeCommand(cmd_line, isBackgroundCmd, false);
+        case ePipeErr:
+            return new PipeCommand(cmd_line, isBackgroundCmd, true);
         case eExternal:
             return new ExternalCommand(cmd_line, isBackgroundCmd);
         default:

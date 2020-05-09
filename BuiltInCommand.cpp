@@ -169,7 +169,7 @@ void KillCommand::execute() {
     bool isValidArgs = _handleArgsForKillCmd(argv, argc);
     JobsList& jobsList = JobsList::getInstance();
     if (isValidArgs) {
-        int sig = _strToInt(argv[2]);
+        int sig = _strToInt(argv[1]);
         int jobId = _strToInt(argv[2]);
         pid_t jobPid = jobsList.getJobPid(jobId);
         // assuming getJobById is returning NULL if there is no job associated with the same id
