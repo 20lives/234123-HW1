@@ -14,15 +14,13 @@ class ExternalCommand : public Command {
 protected:
     char rawCmdLine[COMMAND_ARGS_MAX_LENGTH] = {};
     char cmdLine[COMMAND_ARGS_MAX_LENGTH] = {};
+
     int cmdLineLength = 0;
-    pid_t pid;
 public:
     bool isBackgroundCmd;
     ExternalCommand(const char* cmd_line, bool isBackgroundCmd);
     virtual ~ExternalCommand() {}
     void execute() override;
-    void setPid(pid_t _pid);
-    pid_t getPid();
     string getCommandLine();
 };
 
