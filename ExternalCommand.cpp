@@ -17,7 +17,9 @@
  * Constructors and destructors
  */
 ExternalCommand::ExternalCommand(const char* cmd_line, bool _isBackgroundCmd) : isBackgroundCmd(_isBackgroundCmd), Command(cmd_line) {
+    strcpy(rawCmdLine, cmd_line);
     strcpy(cmdLine, cmd_line);
+    _removeBackgroundSign(cmdLine);
     cmdLineLength = string(cmd_line).length();
 }
 
@@ -36,21 +38,20 @@ void ExternalCommand::execute() {
     args[3] = NULL;
 
     pid_t pid = fork();
-    setPid(pid);
     if (pid == 0) {
         execv("/bin/bash", args);
     } else {
         // parent pid
         if (!isBackgroundCmd){
             FgJob& fgJob = FgJob::getInstance();
-            fgJob.updateFg(cmdLine, pid);
+            fgJob.updateFg(rawCmdLine, pid);
             // in case this is not a background cmd we will wait for the child process to finish
             waitpid(pid, NULL, WUNTRACED);
             fgJob.clearFg();
         } else {
             // running in the background initially
             JobsList& list = JobsList::getInstance();
-            list.addJob(cmdLine, pid);
+            list.addJob(rawCmdLine, pid);
         }
     }
 }
@@ -58,13 +59,6 @@ void ExternalCommand::execute() {
 /**
  * getters and setters
  */
-pid_t ExternalCommand::getPid() {
-    return pid;
-}
-
-void ExternalCommand::setPid(pid_t _pid) {
-    pid = _pid;
-}
 
 string ExternalCommand::getCommandLine() {
     return cmdLine;

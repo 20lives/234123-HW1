@@ -12,6 +12,7 @@
  */
 class ExternalCommand : public Command {
 protected:
+    char rawCmdLine[COMMAND_ARGS_MAX_LENGTH] = {};
     char cmdLine[COMMAND_ARGS_MAX_LENGTH] = {};
     int cmdLineLength = 0;
     pid_t pid;
