@@ -146,3 +146,7 @@ void JobsList::removeFinishedJobs() {
         }
     }
 }
+
+string JobsList::getJobCommnad(int jobId) {
+    return getJobById(jobId)->getCommandLine();
+}

@@ -49,6 +49,7 @@ public:
     JobEntry * getLastJob(int* lastJobId);
     JobEntry *getLastStoppedJob(int *jobId);
     pid_t getJobPid(int jobId);
+    string getJobCommnad(int jobId);
     bool isEmpty();
     bool isIn(int jobId);
     // TODO: Add extra methods or modify existing ones as needed
