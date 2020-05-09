@@ -133,12 +133,12 @@ void JobsList::removeFinishedJobs() {
     _List_iterator<JobEntry *> i = jobsList.begin();
     while (i != jobsList.end()) {
         pid_t pid = (*i)->getPid();
+        pid_t status;
         string command = (*i)->getCommandLine();
-        pid_t status = waitpid(pid, NULL, WNOHANG) ;
-        cout << command << " " << status << "\n";
+        status = waitpid(pid, NULL, WNOHANG) ;
 
         if (status == -1) {
-            // jobsList.erase(i++);
+            jobsList.erase(i++);
             i++;
         }
         else {
