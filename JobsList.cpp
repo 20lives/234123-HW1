@@ -62,7 +62,7 @@ bool JobsList::JobEntry::getIsStopped() {
 void JobsList::addJob(string command, pid_t pid, bool isStopped) {
     int jobId = getNextJobID(); // first jobId should be 1 !!
     JobEntry* entry = new JobEntry(command, isStopped, jobId, pid);
-    jobsList.push_front(entry);
+    jobsList.push_back(entry);
 }
 
 int JobsList::getNextJobID() {
@@ -97,7 +97,6 @@ bool JobsList::isIn(int jobId) {
 }
 
 void JobsList::printJobsList() {
-    jobsList.sort();
     for(const auto& entry : jobsList) {
         std::cout <<  "[" << entry->getJobId() << "] "
         << entry->getCommandLine() << " : " << entry->getPid() << " " << entry->getElapsed() << "secs";
