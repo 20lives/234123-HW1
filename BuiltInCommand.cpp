@@ -254,6 +254,7 @@ void QuitCommand::execute() {
 
 void JobsCommand::execute() {
     JobsList& jobsList = JobsList::getInstance();
+    jobsList.removeFinishedJobs();
     jobsList.printJobsList();
 }
 

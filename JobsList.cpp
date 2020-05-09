@@ -97,7 +97,6 @@ bool JobsList::isIn(int jobId) {
 }
 
 void JobsList::printJobsList() {
-    removeFinishedJobs();
     jobsList.sort();
     for(const auto& entry : jobsList) {
         std::cout <<  "[" << entry->getJobId() << "] "
