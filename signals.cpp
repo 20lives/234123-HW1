@@ -1,19 +1,25 @@
 #include <iostream>
 #include <signal.h>
+#include <unistd.h>
 
 #include "signals.h"
 #include "FgJob.h"
 #include "JobsList.h"
-#include <sys/types.h>
-#include <unistd.h>
+#include "RedirectionCommand.h"
 
 using namespace std;
 
 void ctrlCHandler(int sig_num) {
     // TODO: Add your implementation
     // send SIGKILL to the process in the foreground
-    std::cout << "smash: got ctrl-C" << "\n";
+    RedInfo& redInfo = RedInfo::getInstance();
     FgJob& fgJob = FgJob::getInstance();
+
+    close(1);
+    dup(redInfo.origin_out);
+    close(redInfo.origin_out);
+    std::cout << "smash: got ctrl-C" << "\n";
+
     if (fgJob.isFgJobRunning()) {
         pid_t pid = fgJob.getPid();
         if(kill(pid, SIGKILL) == 0) {
