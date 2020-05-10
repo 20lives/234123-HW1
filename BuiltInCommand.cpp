@@ -260,10 +260,8 @@ void QuitCommand::execute() {
         int jobsCount = jobsList.getJobsCount();
         std::cout << "smash: sending SIGKILL signal to " << jobsCount << " jobs:" << "\n";
         jobsList.killAllJobs();
-    } else  {
-        // cmd is quit
-        exit(0);
     }
+    exit(0);
 }
 
 void JobsCommand::execute() {
