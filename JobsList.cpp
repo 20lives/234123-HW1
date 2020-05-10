@@ -115,13 +115,12 @@ bool JobsList::isIn(int jobId) {
 void JobsList::printJobsList() {
     for(const auto& entry : jobsList) {
         std::cout <<  "[" << entry->getJobId() << "] "
-        << entry->getCommandLine() << " : " << entry->getPid() << " " << entry->getElapsed() << "secs";
+        << entry->getCommandLine() << " : " << entry->getPid() << " " << entry->getElapsed() << " secs";
         if (entry->getIsStopped() )
         {
             std::cout << " (stopped)";
         }
         std::cout << "\n";
-        // [<job-id>] <command> : <process id> <seconds elapsed>
     }
 }
 
@@ -153,7 +152,7 @@ void JobsList::removeFinishedJobs() {
         string command = (*i)->getCommandLine();
         status = waitpid(pid, NULL, WNOHANG) ;
 
-        if (status == -1) {
+        if (status != 0) {
             jobsList.erase(i++);
             i++;
         }
