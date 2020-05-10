@@ -103,6 +103,8 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
     bool isBackgroundCmd;
     CMD_TYPE eCmdType;
 
+    RedInfo& redInfo = RedInfo::getInstance();
+
     // 1. check if &
     isBackgroundCmd = (string(cmd_line).back() == '&');
     // 2. remove last &
@@ -142,7 +144,7 @@ Command *SmallShell::CreateCommand(const char* cmd_line) {
         case ePipeErr:
             return new PipeCommand(cmd_line, isBackgroundCmd, true);
         case eExternal:
-            return new ExternalCommand(cmd_line, isBackgroundCmd);
+            return new ExternalCommand(cmd_line, (redInfo.isRedirection) ? redInfo.isBackground : isBackgroundCmd); // if redirection get isBackground from redInfo instance class
         default:
             return nullptr;
     }

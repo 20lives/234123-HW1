@@ -2,9 +2,9 @@
 // Created by nomi on 5/9/20.
 //
 #include <string.h>
-
-#include <string.h>
+#include <unistd.h>
 #include <iostream>
+#include <fcntl.h>
 
 #include "RedirectionCommand.h"
 #include "Utilities.h"
@@ -26,11 +26,31 @@ RedirectionCommand::RedirectionCommand(const char *cmd_line, bool _isBackground,
             strcpy(cmd, string(cmdLine).substr(0, found).c_str());
             strcpy(file, string(cmdLine).substr(found + 2).c_str());
     }
+    //strcpy(file, string(file).substr(0, string(file).find(" ")).c_str());
     std::cout << "cmd: " << cmd << "file: " << file << '\n';
 
 }
 
 void RedirectionCommand::execute() {
+    SmallShell& smallShell = SmallShell::getInstance();
+    RedInfo& redInfo = RedInfo::getInstance();
+    redInfo.isBackground = this->isBackground;
+    redInfo.isRedirection = true;
+    strcpy(redInfo.rawCmdLine, rawCmdLine);
 
+    int origin_out = dup(1);
+    redInfo.origin_out = origin_out;
+    int fd_out = (!isAppend) ? open(file,  O_WRONLY|O_CREAT|O_TRUNC,0666) : open(file, O_WRONLY|O_CREAT|O_TRUNC | O_APPEND,0666);
+    close(1);
+    dup(fd_out);
+    close(fd_out);
+
+    smallShell.executeCommand(cmd);
+
+    close(1);
+    dup(origin_out);
+    close(origin_out);
+    redInfo.isBackground = false;
+    redInfo.isRedirection = false;
 }
 

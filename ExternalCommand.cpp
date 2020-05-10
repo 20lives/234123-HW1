@@ -12,6 +12,7 @@
 #include "Commands.h"
 #include "JobsList.h"
 #include "FgJob.h"
+#include "RedirectionCommand.h"
 
 /**
  * Constructors and destructors
@@ -39,7 +40,9 @@ void ExternalCommand::execute() {
 
     pid_t pid = fork();
     if (pid == 0) {
+        setpgrp();
         execv("/bin/bash", args);
+        exit(0);
     } else {
         // parent pid
         if (!isBackgroundCmd){
@@ -49,8 +52,13 @@ void ExternalCommand::execute() {
             waitpid(pid, NULL, WUNTRACED);
         } else {
             // running in the background initially
+            RedInfo& redInfo = RedInfo::getInstance();
             JobsList& list = JobsList::getInstance();
+            if (!redInfo.isRedirection) {
             list.addJob(rawCmdLine, pid);
+            } else {
+                list.addJob(redInfo.rawCmdLine, pid);
+            }
         }
     }
 }

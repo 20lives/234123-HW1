@@ -4,6 +4,23 @@
 
 #ifndef HW1_234123_REDIRECTIONCOMMAND_H
 #define HW1_234123_REDIRECTIONCOMMAND_H
+#include "Utilities.h"
+
+class RedInfo {
+    RedInfo(){
+
+    }
+public:
+    int origin_out;
+    bool isBackground = false;
+    bool isRedirection = false;
+    char rawCmdLine[COMMAND_ARGS_MAX_LENGTH] = {};
+    static RedInfo& getInstance() {
+        static RedInfo instance;
+        return instance;
+    }
+};
+
 
 #include "Commands.h"
 
