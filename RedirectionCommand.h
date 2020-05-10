@@ -13,6 +13,9 @@ class RedirectionCommand : public Command {
     int cmdLineLength = 0;
     bool isBackground = false;
     bool isAppend = false;
+
+    char cmd[COMMAND_ARGS_MAX_LENGTH] = {};
+    char file[COMMAND_ARGS_MAX_LENGTH] = {};
 public:
     explicit RedirectionCommand(const char* cmd_line, bool _isRedirectionCmd, bool isAppend = false);
     virtual ~RedirectionCommand() {}
