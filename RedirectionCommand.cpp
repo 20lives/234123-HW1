@@ -19,14 +19,8 @@ RedirectionCommand::RedirectionCommand(const char *cmd_line, bool _isBackground,
     _removeBackgroundSign(cmdLine);
 
     std::size_t found = string(cmd_line).find_first_of('>');
-    if (!_isAppend) {
-        strcpy(cmd, string(cmdLine).substr(0, found).c_str());
-        strcpy(file, string(cmdLine).substr(found + 1).c_str());
-    } else {
-            strcpy(cmd, string(cmdLine).substr(0, found).c_str());
-            strcpy(file, string(cmdLine).substr(found + 2).c_str());
-    }
-    //strcpy(file, string(file).substr(0, string(file).find(" ")).c_str());
+    strcpy(cmd, string(cmdLine).substr(0, found).c_str());
+    strcpy(file, _trim(string(cmdLine).substr(found + 1 + _isAppend)).c_str());
     std::cout << "cmd: " << cmd << "file: " << file << '\n';
 
 }
