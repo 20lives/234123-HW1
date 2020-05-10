@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <vector>
+#include <iostream>
 
 #include "SmallShell.h"
 #include "Utilities.h"
@@ -91,6 +92,7 @@ string SmallShell::getPrevDir() {
 * Creates and returns a pointer to Command class which matches the given command line (cmd_line)
 */
 Command *SmallShell::CreateCommand(const char* cmd_line) {
+    //std::cout << "cmd createCommand: " << cmd_line << '\n';
     char *argv[COMMAND_MAX_ARGS] = {};
     int argc = _parseCommandLine(cmd_line, argv);
 

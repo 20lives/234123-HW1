@@ -23,7 +23,7 @@ void ctrlCHandler(int sig_num) {
     if (fgJob.isFgJobRunning()) {
         pid_t pid = fgJob.getPid();
         if(kill(pid, SIGKILL) == 0) {
-            std::cout << "msg: smash: process " << pid <<" was killed" << "\n";
+            std::cout << "smash: process " << pid <<" was killed" << "\n";
         }
     }
 }
@@ -42,7 +42,7 @@ void ctrlZHandler(int sig_num) {
         jobsList.addJob(fgJob.getCmdLine(), pid, true);
 
         if(kill(pid, SIGSTOP) == 0) {
-            std::cout << "msg: smash: process " << pid <<" was stopped" << "\n";
+            std::cout << "smash: process " << pid <<" was stopped" << "\n";
         }
     }
 }
